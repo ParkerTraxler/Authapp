@@ -12,12 +12,8 @@
     <label for="last_name">Last Name:</label>
     {{ form.last_name(class="form-control")}}
 
+    <label for="last_name">Email:</label>
+    {{ form.email(class="form-control")}}
+
     <button type="submit" class="btn btn-primary mt-3">{{ form.submit.label }}</button>
 </form>
-
- <!-- delete account button -->
- <form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Are you certain you wish to delete your account? This cannot be undone.')">
-    <button type="submit" class="btn btn-danger mt-3">Delete Account</button>
- </form>
-
-{% endblock %}
