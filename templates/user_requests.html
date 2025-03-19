@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Submit a Request</h3>
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    
+    <div class="form-group">
+        {{ form.request_type.label }} 
+        {{ form.request_type(class="form-control") }}
+    </div>
+
+    <div class="form-group mt-3">
+        {{ form.signature.label }}
+        {{ form.signature(class="form-control-file") }}
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">{{ form.submit.label }}</button>
+</form>
+
+<h3 class="mt-5">Your Previous Requests</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Request Type</th>
+            <th>Status</th>
+            <th>Signature</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in user_requests %}
+            <tr>
+                <td>{{ request.rType }}</td> <!-- Updated to rType if that's what you're using in the database -->
+                <td>
+                    <span class="badge {% if request.status == 'Approved' %}bg-success{% elif request.status == 'Rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                        {{ request.status }}
+                    </span>
+                </td>
+                <td>
+                    {% if request.signature %}
+                        <img src="{{ url_for('static', filename='uploads/signatures/' + request.signature) }}" width="100" height="100">
+                    {% else %}
+                        No signature uploaded
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -20,15 +20,24 @@
                     </li>
 
                     {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <!-- Show logout when the user is authenticated-->
-                        <a class="nav-link" href="/logout">Logout</a>
-                    </li>
-                    <li class="nav-item">
-                        <!-- Show account dashboard when the user is authenticated-->
-                        <a class="nav-link" href="/edit-profile">Manage Account</a>
-                    </li>
-
+                        <li class="nav-item">
+                            <!-- Show logout when the user is authenticated-->
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                        <li class="nav-item">
+                            <!-- Show account dashboard when the user is authenticated-->
+                            <a class="nav-link" href="/profile">Profile</a>
+                        </li>
+                        {% if current_user.role == "administrator" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin">Admin Console</a>
+                            </li>
+                        {% endif %}
+                        {% if current_user.role == "basicuser" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/user-requests">Requests</a>
+                            </li>
+                        {% endif %}
                     {% else %}
 
                     <li class="nav-item">
