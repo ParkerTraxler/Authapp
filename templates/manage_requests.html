@@ -13,6 +13,7 @@
 			<th>Form</th>
 			<th>Time Requested</th>
 			<th>File</th>
+			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -22,6 +23,14 @@
 			<td>{{ request.time }}</td>
 			<!-- Placeholder Link -->
 			<td><a href="#">Download</a></td>
+			<td>
+                <form action="{{ url_for('approve_request', request_id=request.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-success">Approve</button>
+                </form>
+                <form action="{{ url_for('return_request', request_id=request.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-warning">Return</button>
+                </form>
+            </td>
 		</tr>
 		{% endfor %}
 	</tbody>
@@ -35,7 +44,6 @@
 			<th>Form</th>
 			<th>Time Returned</th>
 			<th>File</th>
-			<th>Edit</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -44,28 +52,6 @@
 			<td>{{ request.req_type}}</td>
 			<td>{{ request.time }}</td>
 			<!-- Placeholder Links -->
-			<td><a href="#">Download</a></td>
-			<td><a href="#">Download</a></td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
-
-<!-- Draft -->
-<h2 class="mb-3">Draft</h2>
-<table class="table">
-	<thead>
-		<tr>
-			<th>Form</th>
-			<th>File</th>
-			<th>Edit</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for request in draft_requests %}
-		<tr>
-			<td>{{ request.req_type }}</td>
-			<td><a href="#">Download</a></td>
 			<td><a href="#">Download</a></td>
 		</tr>
 		{% endfor %}
