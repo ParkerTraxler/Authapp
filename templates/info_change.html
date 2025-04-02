@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Name/SSN Change{% endblock %}
+{% block content %}
+<h1 class="mb-3">Name/SSN Change Form</h1>
+
+<form method="POST" enctype="multipart/form-data">
+	{{ form.hidden_tag() }}
+
+	<h3 class="mb-3">Name and PeopleSoft ID</h3>
+
+	<!-- Name -->
+	<div class="mb-3">
+		<label for="name" class="form-label">Name:</label>
+		{{ form.name(class="form-control") }}
+	</div>
+
+	<!-- PeopleSoft ID -->
+	<div class="mb-3">
+		<label for="peoplesoft_id" class="form-label">myUH ID:</label>
+		{{ form.peoplesoft_id(class="form-control") }}
+	</div>
+
+	<!-- SECTION A: NAME CHANGE -->
+	<h3 class="mb-3">Section A: Name Change</h3>
+	<!-- Old name info -->
+	<h4 class="mb-3">Current Name</h4>
+	<div class="mb-3">
+		<label for="first_name_old" class="form-label">Current First Name:</label>
+		{{ form.first_name_old(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="middle_name_old" class="form-label">Current Middle Name:</label>
+		{{ form.middle_name_old(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="last_name_old" class="form-label">Current Last Name:</label>
+		{{ form.last_name_old(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="suffix_old" class="form-label">Current Suffix:</label>
+		{{ form.suffix_old(class="form-control") }}
+	</div>
+
+	<!-- New name info -->
+	<h4 class="mb-3">New Name</h4>
+	<div class="mb-3">
+		<label for="first_name_new" class="form-label">New First Name:</label>
+		{{ form.first_name_new(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="middle_name_new" class="form-label">New Middle Name:</label>
+		{{ form.middle_name_new(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="last_name_new" class="form-label">New Last Name:</label>
+		{{ form.last_name_new(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="suffix_new" class="form-label">New Suffix:</label>
+		{{ form.suffix_new(class="form-control") }}
+	</div>
+
+	<!-- SECTION B: SSN CHANGE -->
+	<h3 class="mb-3">Section B: SSN Change</h3>
+	<div class="mb-3">
+		<label for="ssn_old" class="form-label">Old SSN:</label>
+		{{ form.ssn_old(class="form-control", placeholder="123-45-678") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="ssn_new" class="form-label">New SSN:</label>
+		{{ form.ssn_new(class="form-control", placeholder="123-45-678") }}
+	</div>
+
+	<h3 class="mb-3">Sign and Date</h3>
+	<!-- Signature (File Upload) -->
+	<div class="mb-3">
+		<label for="peoplesoft_id" class="form-label">Signature Upload</label>
+		{{ form.signature(class="form-control") }}
+	</div>
+
+	<!-- Date -->
+	<div class="mb-3">
+		<label for="date" class="form-label">Date:</label>
+		{{ form.date(class="form-control") }}
+	</div>
+
+	<button type="submit" class="btn btn-primary mt-3 mb-3">{{ form.submit.label }}</button>
+
+</form>
+{% endblock %}

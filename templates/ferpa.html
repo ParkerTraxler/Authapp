@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}FERPA Form{% endblock %}
+{% block content %}
+<h1 class="mb-3">FERPA Release Form</h1>
+
+<form method="POST" enctype="multipart/form-data">
+	{{ form.hidden_tag() }}
+
+	<!-- Name -->
+	<div class="mb-3">
+		<label for="name" class="form-label">Name:</label>
+		{{ form.name(class="form-control") }}
+	</div>
+
+	<!-- Campus -->
+	<div class="mb-3">
+		<label for="campus" class="form-label">Campus:</label>
+		{{ form.campus(class="form-control") }}
+	</div>
+
+	<!-- Check boxes + other fields -->
+
+	<!-- Release to -->
+	<div class="mb-3">
+		<label for="release_to" class="form-label">Release to:</label>
+		{{ form.release_to(class="form-control") }}
+	</div>
+
+	<!-- Purpose -->
+	<div class="mb-3">
+		<label for="purpose" class="form-label">Purpose:</label>
+		{{ form.purpose(class="form-control") }}
+	</div>
+
+	<!-- Check boxes + other fields -->
+
+	<!-- Additional names -->
+	<div class="mb-3">
+		<label for="password" class="form-label">Additional Names:</label>
+		{{ form.additional_names(class="form-control") }}
+	</div>
+
+	<!-- Password -->
+	<div class="mb-3">
+		<label for="password" class="form-label">Password:</label>
+		{{ form.password(class="form-control") }}
+	</div>
+
+	<!-- Peoplesoft ID -->
+	<div class="mb-3">
+		<label for="peoplesoft_id" class="form-label">myUH ID:</label>
+		{{ form.peoplesoft_id(class="form-control") }}
+	</div>
+
+	<!-- Signature (File Upload) -->
+	<div class="mb-3">
+		<label for="peoplesoft_id" class="form-label">Signature Upload</label>
+		{{ form.signature(class="form-control") }}
+	</div>
+
+	<!-- Date -->
+	<div class="mb-3">
+		<label for="date" class="form-label">Date:</label>
+		{{ form.date(class="form-control") }}
+	</div>
+
+	<button type="submit" class="btn btn-primary mt-3 mb-3">{{ form.submit.label }}</button>
+
+</form>
+{% endblock %}

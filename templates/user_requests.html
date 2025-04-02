@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Academic Requests{% endblock %}
+
+{% block content %}
+
+<!-- Pending academic requests -->
+<h1 class="mb-3">Pending Requests</h1>
+<table class="table-dark">
+	<thead>
+		<tr>
+			<th>Form</th>
+			<th>Status</th>
+			<th>Time Requested</th>
+			<!-- Get PDF/Signature -->
+	</thead>
+	<tbody>
+		<!-- Get all pending and returned requests -->
+		{% for request in pending_requests %}
+		<tr>
+			<td>{{ request.req_type }}</td>
+			<td>
+				<span class="badge {% if request.status == "pending" %} bg-secondary {% else %} bg-danger {% endif %}">
+					{{ 'Pending' if request.req_type == "pending" else 'Returned' }}
+				</span>
+			</td>
+			<td>{{ request.created_at }}</td>
+			<!-- Get PDF/Signature -->
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<!-- Completed academic requests -->
+<h1 class="mb-3">Completed Requests</h1>
+<table class="table">
+	<thead>
+		<th>Request Type</th>
+		<th>Status</th>
+	</thead>
+</table>
+
+{% endblock %}
+
