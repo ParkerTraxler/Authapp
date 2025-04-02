@@ -1,18 +1,16 @@
 import os, uuid
-from flask import Flask, render_template, redirect, url_for, request, session, flash, abort
+from flask import Flask, render_template, redirect, url_for, request, flash, session
 from msal import ConfidentialClientApplication
 # Load database modules
-from flask_sqlalchemy import SQLAlchemy
+from models import db, User, Role, Request
 from flask_migrate import Migrate
-# Load form modules
-from flask_wtf import FlaskForm
-from wtforms import DateField, IntegerField, StringField, EmailField, SubmitField, BooleanField, SelectMultipleField, FileField
-from wtforms.validators import DataRequired, Email, Length, Regexp
-# Load environment variables
+# Forms
+from forms import ProfileForm, UserForm, FERPAForm, InfoChangeForm
+# Environment Variables
 from dotenv import load_dotenv
 load_dotenv()
 # Tools for RBAC
-from functools import wraps
+from decorators import role_required
 # Import config file
 import config
 
@@ -23,7 +21,7 @@ app = Flask(__name__)
 app.config.from_object(config.Config)
 
 # Initialize SQLAlchemy and Migrate
-db = SQLAlchemy(app)
+db.init_app(app)
 migrate = Migrate(app, db)
 
 # MSAL client
@@ -36,74 +34,6 @@ app_instance = ConfidentialClientApplication(
 # Check image extension
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
-### MODELS ###
-# Association table for users and roles
-user_roles = db.Table('user_roles',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('role_id', db.Integer, db.ForeignKey('roles.id'), primary_key=True))
-
-# Role model
-class Role(db.Model):
-    __tablename__ = 'roles'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
-
-    def __repr__(self):
-        return f"<Role {self.name}>"
-
-# User model
-class User(db.Model):
-    __tablename__ = 'users'
-
-    id = db.Column(db.Integer, primary_key=True)
-    azure_id = db.Column(db.String(100), unique=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(100))
-    roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
-    active = db.Column(db.Boolean(), default=True)
-
-    requests = db.relationship('Request', back_populates='user', lazy=True)
-
-    def has_role(self, role_name):
-        return any(role.name == role_name for role in self.roles)
-
-    def __repr__(self):
-        return f"<User {self.name}>"
-
-# Requests model
-class Request (db.Model):
-    __tablename__ = 'requests'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    status = db.Column(db.String(10), nullable=False)
-    req_type = db.Column(db.String(15), nullable=False)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
-    signature = db.Column(db.String(100), nullable=True)
-
-    user = db.relationship('User', back_populates='requests')
-
-# Decorator function to check roles
-def role_required(role_name):
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if not session.get('logged_in', False):
-                return redirect(url_for("login", next=request.url))
-
-            # Get current user
-            user = User.query.filter_by(azure_id=session['user']['sub']).first()
-
-            if not user or not user.has_role(role_name):
-                flash('You do not have permission to access this page', 'danger')
-                return redirect(url_for("home"))
-
-            return f(*args, **kwargs)
-        return decorated_function
-    return decorator
 
 # Create default roles
 def create_default_roles():
@@ -120,83 +50,6 @@ def create_default_roles():
             db.session.add(role)
 
     db.session.commit()
-
-### FORMS ###
-
-# Profile Form
-class ProfileForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=100)])
-    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=100)])
-    submit = SubmitField('Save Changes')
-
-# User management form
-class UserForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=100)])
-    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=100)])
-    active = BooleanField('Active', default=True)
-    roles = SelectMultipleField('Roles', coerce=int)
-    submit = SubmitField('Save Changes')
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        # Populate roles from database
-        self.roles.choices = [(role.id, role.name) for role in Role.query.all()]
-
-class FERPAForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=25)])
-    campus = StringField('Campus', validators=[DataRequired(), Length(min=2, max=25)])
-    
-    # Authorized checkpoints AND optional 'other' field
-
-    # Categories checkpoints AND optional 'other' field
-
-    release_to = StringField('Release to', validators=[DataRequired(), Length(max=25)])
-    purpose = StringField('Purpose', validators=[DataRequired(), Length(max=25)])
-
-    additional_names = StringField('Additional Individuals', validators=[DataRequired(), Length(max=25)])
-
-    # Individuals checkpoints AND optional 'other' field
-
-    password = StringField('Password', validators=[DataRequired(), Length(min=5, max=16)])
-
-    peoplesoft_id = StringField('PSID', validators=[DataRequired(), Length(min=6, max=6)])
-    signature = FileField('Upload Signature', validators=[DataRequired()])
-    date = DateField('Birthdate', format='%Y-%m-%d', validators=[DataRequired()])
-
-    submit = SubmitField('Submit FERPA')
-
-
-class InfoChangeForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(max=25)])
-    peoplesoft_id = StringField('UH ID', validators=[DataRequired(), Length(min=6, max=6)])
-
-    # Choice for name/SSN
-
-    # Section A: Name Change
-    first_name_old = StringField('Old Name', validators=[Length(max=25)])
-    middle_name_old = StringField('Old Mid. Name', validators=[Length(max=25)])
-    last_name_old = StringField('Old Last Name', validators=[Length(max=25)])
-    suffix_old = StringField('Old Suffix', validators=[Length(max=10)])
-
-    first_name_new = StringField('Old Name', validators=[Length(max=25)])
-    middle_name_new = StringField('Old Mid. Name', validators=[Length(max=25)])
-    last_name_new = StringField('Old Last Name', validators=[Length(max=25)])
-    suffix_new = StringField('Old Suffix', validators=[Length(max=10)])
-
-    # Reason for name change checkbox
-
-    # Section B: SSN Change
-    ssn_old = StringField('Old SSN', validators=[Regexp(r"^\d{3}-\d{2}-\d{4}$", message="SSN must be in the format XXX-XX-XXXX")])
-    ssn_new = StringField('New SSN', validators=[Regexp(r"^\d{3}-\d{2}-\d{4}$", message="SSN must be in the format XXX-XX-XXXX")])
-
-    # Reason for SSN change checkbox
-
-    # Signature and date
-    signature = FileField('Upload Signature', validators=[DataRequired()])
-    date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
-
-    submit = SubmitField('Submit SSN/Name Change')
 
 ### ROUTES ###
 
@@ -404,20 +257,62 @@ def activate_user(user_id):
 ## APPROVAL & ACADEMIC REQUESTS ##
 
 # Manager dashboard for request management
-@app.route('/manager/requests')
+@app.route('/manager/requests/manage')
 @role_required('manager')
 def manage_requests():
-    return "manage requests"
+    pending_requests = Request.query.filter_by(status='pending').all()
+    returned_requests = Request.query.filter_by(status='returned').all()
+    approved_requests = Request.query.filter_by(status='approved').all()
+    return render_template('manage_requests.html', 
+                           pending_requests=pending_requests, 
+                           returned_requests=returned_requests,
+                           approved_requests=approved_requests,
+                           logged_in=True)
+
+@app.route('/manager/requests/approve/<int:request_id>', methods=['POST'])
+@role_required('manager')
+def approve_request(request_id):
+    req = Request.query.get_or_404(request_id)
+    req.status = 'approved'
+    
+    db.session.commit()
+    
+    flash('Request approved successfully.', 'success')
+    return redirect(url_for('manage_requests'))
+
+@app.route('/manager/requests/return/<int:request_id>', methods=['POST'])
+@role_required('manager')
+def return_request(request_id):
+    req = Request.query.get_or_404(request_id)
+    req.status = 'returned'
+    
+    db.session.commit()
+    
+    flash('Request returned successfully.', 'warning')
+    return redirect(url_for('manage_requests'))
 
 # User dashboard for seeing requests
 @app.route('/user/requests/manage')
 @role_required('user')
 def user_requests():
-    logged_in = session.get('logged_in', False)
+   
+    # Get user id for requests
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
 
-    print(logged_in)
+    # Get all types of requests
+    pending_requests = Request.query.filter_by(user_id=user.id, status='pending').all()
+    returned_requests = Request.query.filter_by(user_id=user.id, status='returned').all()
+    draft_requests = Request.query.filter_by(user_id=user.id, status='draft').all()
+    completed_requests = Request.query.filter_by(user_id=user.id, status='completed').all()
+    approved_requests = Request.query.filter_by(user_id=user.id, status='approved').all()
 
-    return render_template('user_requests.html', logged_in=logged_in)
+    return render_template('user_requests.html',
+                           pending_requests=pending_requests,
+                           returned_requests=returned_requests,
+                           draft_requests=draft_requests,
+                           completed_requests=completed_requests,
+                           approved_requests=approved_requests,
+                           logged_in=True)
 
 # FERPA form page
 @app.route('/user/requests/ferpa', methods=['GET', 'POST'])
@@ -519,6 +414,19 @@ def info_change_request():
             return redirect(url_for('user_requests'))
 
     return render_template('info_change.html', form=form, logged_in=True)
+
+# Generate FERPA PDF form
+@app.route('/manager/requests/generate_ferpa', methods=['POST'])
+@role_required('manager')
+def generate_ferpa():
+    pass
+
+# Generate SSN/Name Change PDF Form
+@app.route('/manager/requests/generate_name_ssn')
+@role_required('manager')
+def generate_name_ssn():
+    pass
+
 
 ## MISCELLANEOUS ##
 @app.route('/about')

@@ -24,8 +24,10 @@ MarkupSafe==3.0.2
 msal==1.32.0
 mysqlclient==2.2.7
 named==1.4.2
+ordered-set==4.1.0
 pycparser==2.22
 PyJWT==2.10.1
+PyLaTeX==1.4.2
 python-dotenv==1.1.0
 requests==2.32.3
 solus==1.2.2
