@@ -24,7 +24,7 @@
 		<tr>
 			<td>{{ request.req_type }}</td>
 			<td>{{ request.time }}</td>
-			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">Download</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">File</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>
@@ -46,8 +46,7 @@
 		<tr>
 			<td>{{ request.req_type}}</td>
 			<td>{{ request.time }}</td>
-			<!-- Placeholder Links -->
-			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">Download</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">File</a></td>
 			<td><a href="#">Edit</a></td>
 		</tr>
 		{% endfor %}
@@ -68,7 +67,7 @@
 		{% for request in draft_requests %}
 		<tr>
 			<td>{{ request.req_type }}</td>
-			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">Download</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">File</a></td>
 			<td><a href="#">Edit</a></td>
 		</tr>
 		{% endfor %}
@@ -90,7 +89,7 @@
 		<tr>
 			<td>{{ request.req_type }}</td>
 			<td>{{ request.time }}</td>
-			<td><a href="#">Edit</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">File</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>
