@@ -21,8 +21,7 @@
 		<tr>
 			<td>{{ request.req_type }}</td>
 			<td>{{ request.time }}</td>
-			<!-- Placeholder Link -->
-			<td><a href="#">Download</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}"></a></td>
 			<td>
                 <form action="{{ url_for('approve_request', request_id=request.id) }}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-success">Approve</button>
@@ -51,8 +50,7 @@
 		<tr>
 			<td>{{ request.req_type}}</td>
 			<td>{{ request.time }}</td>
-			<!-- Placeholder Links -->
-			<td><a href="#">Download</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}"></a></td>
 		</tr>
 		{% endfor %}
 	</tbody>
@@ -73,7 +71,7 @@
 		<tr>
 			<td>{{ request.req_type }}</td>
 			<td>{{ request.time }}</td>
-			<td><a href="#">Download</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}"></a></td>
 		</tr>
 		{% endfor %}
 	</tbody>
