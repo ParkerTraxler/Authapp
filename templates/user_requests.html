@@ -4,6 +4,10 @@
 {% block content %}
 
 <h1 class="mb-3">Request Management</h1>
+<h3 class="mb-3">FERPA</h3>
+<p>Click <a href="ferpa">here</a> to fill out the FERPA form.</p>
+<h3 class="mb-3">Name/SSN Change</h3>
+<p>Click <a href="info_change">here</a> to fill out the name change/SSN form.</p>
 
 <!-- Pending -->
 <h2 class="mb-3">Pending</h2>
@@ -20,8 +24,7 @@
 		<tr>
 			<td>{{ request.req_type }}</td>
 			<td>{{ request.time }}</td>
-			<!-- Placeholder Link -->
-			<td><a href="#">Download</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">Download</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>
@@ -44,8 +47,8 @@
 			<td>{{ request.req_type}}</td>
 			<td>{{ request.time }}</td>
 			<!-- Placeholder Links -->
-			<td><a href="#">Download</a></td>
-			<td><a href="#">Download</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">Download</a></td>
+			<td><a href="#">Edit</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>

@@ -6,6 +6,8 @@
 <form method="POST" enctype="multipart/form-data">
 	{{ form.hidden_tag() }}
 
+	
+	<h2 class="mb-3">Name and Campus</h2>
 	<!-- Name -->
 	<div class="mb-3">
 		<label for="name" class="form-label">Name:</label>
@@ -18,8 +20,36 @@
 		{{ form.campus(class="form-control") }}
 	</div>
 
-	<!-- Check boxes + other fields -->
+	<h2 class="mb-3">Officials</h2>
+	<h4 class="mb-3">Authorize officials to disclose information</h4>
+	<!-- Officials + Other field-->
+	<div class="mb-3">
+		<label for="official_choices" class="form-label">Choose:</label>
+		{{ form.official_choices(class="form-control") }}
+	</div>
 
+	<div class="mb-3">
+		<label for="official_other" class="form-label">Other:</label>
+		<small>Only fill out this field if you selected other above.</small>
+		{{ form.official_other(class="form-control") }}
+	</div>
+
+	<h2 class="mb-3">Information</h2>
+	<h4 class="mb-3">Authorize type of information to disclose</h4>
+	<!-- Check boxes + other fields -->
+	<div class="mb-3">
+		<label for="info_choices" class="form-label">Choose:</label>
+		{{ form.info_choices(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="info_other" class="form-label">Other:</label>
+		<small>Only fill out this field if you selected other above.</small>
+		{{ form.info_other(class="form-control") }}
+	</div>
+
+	<h2 class="mb-3">Release</h2>
+	<h4 class="mb-3">Authorize individuals to receive your information</h4>
 	<!-- Release to -->
 	<div class="mb-3">
 		<label for="release_to" class="form-label">Release to:</label>
@@ -32,33 +62,42 @@
 		{{ form.purpose(class="form-control") }}
 	</div>
 
-	<!-- Check boxes + other fields -->
-
 	<!-- Additional names -->
 	<div class="mb-3">
-		<label for="password" class="form-label">Additional Names:</label>
+		<label for="additional_names" class="form-label">Additional Names:</label>
 		{{ form.additional_names(class="form-control") }}
 	</div>
 
-	<!-- Password -->
+	<!-- Release to selection -->
+	<div class="mb-3">
+		<label for="release_choices" class="form-label">Choose:</label>
+		{{ form.release_choices(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="release_other" class="form-label">Other:</label>
+		<small>Only fill out this field if you selected other above.</small>
+		{{ form.release_other(class="form-control") }}
+	</div>
+
+
+	<h2 class="mb-3">Security & Signature</h2>
+	<!-- Essential Info -->
 	<div class="mb-3">
 		<label for="password" class="form-label">Password:</label>
 		{{ form.password(class="form-control") }}
 	</div>
 
-	<!-- Peoplesoft ID -->
 	<div class="mb-3">
 		<label for="peoplesoft_id" class="form-label">myUH ID:</label>
 		{{ form.peoplesoft_id(class="form-control") }}
 	</div>
 
-	<!-- Signature (File Upload) -->
 	<div class="mb-3">
 		<label for="peoplesoft_id" class="form-label">Signature Upload</label>
 		{{ form.signature(class="form-control") }}
 	</div>
 
-	<!-- Date -->
 	<div class="mb-3">
 		<label for="date" class="form-label">Date:</label>
 		{{ form.date(class="form-control") }}

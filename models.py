@@ -46,6 +46,6 @@ class Request (db.Model):
     status = db.Column(db.String(10), nullable=False)
     req_type = db.Column(db.String(15), nullable=False)
     time = db.Column(db.DateTime, server_default=db.func.now())
-    signature = db.Column(db.String(100), nullable=True)
+    pdf_link = db.Column(db.String(100), nullable=True)
 
     user = db.relationship('User', back_populates='requests')

@@ -20,6 +20,10 @@
 		{{ form.peoplesoft_id(class="form-control") }}
 	</div>
 
+	<div class="mb-3">
+		<label for="choice" class="form-label">Update Name or SSN?</label>
+		{{ form.choice(class="form-control") }}
+	</div>
 	<!-- SECTION A: NAME CHANGE -->
 	<h3 class="mb-3">Section A: Name Change</h3>
 	<!-- Old name info -->
@@ -66,6 +70,13 @@
 		{{ form.suffix_new(class="form-control") }}
 	</div>
 
+	<!-- Name change reason checkbox -->
+	<div class="mb-3">
+		<label for="name_change_reason" class="form-label">Reason for Name Change:</label>
+		{{ form.name_change_reason(class="form-control") }}
+	</div>
+
+
 	<!-- SECTION B: SSN CHANGE -->
 	<h3 class="mb-3">Section B: SSN Change</h3>
 	<div class="mb-3">
@@ -76,6 +87,12 @@
 	<div class="mb-3">
 		<label for="ssn_new" class="form-label">New SSN:</label>
 		{{ form.ssn_new(class="form-control", placeholder="123-45-678") }}
+	</div>
+
+	<!-- SSN change reason checkbox -->
+	<div class="mb-3">
+		<label for="ssn_change_reason" class="form-label">Reason for SSN Change</label>
+		{{ form.ssn_change_reason(class="form-control") }}
 	</div>
 
 	<h3 class="mb-3">Sign and Date</h3>
