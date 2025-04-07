@@ -38,6 +38,9 @@ def generate_ferpa(data):
     # Compile
     subprocess.run(["pdflatex", "-interaction=nonstopmode", "-output-directory", FERPA_OUTPUT, tex_file_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+    print(tex_file_path)
+    print(pdf_file_path)
+
     # Return path to PDF
     return pdf_file_path
 

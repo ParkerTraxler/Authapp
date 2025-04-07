@@ -332,6 +332,9 @@ def ferpa_request():
     # User FERPA form
     form = FERPAForm()
 
+    # Get current user
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+
     if form.validate_on_submit():
         
         # Ensure the user uploaded a signature
@@ -351,11 +354,12 @@ def ferpa_request():
             unique_filename = str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower()
 
             # Save file with new name
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+            filepath = os.path.normpath(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
             file.save(filepath)
 
+            latex_path = filepath.replace("\\", "/")
+
             # Get user id from session
-            user = User.query.filter_by(azure_id=session['user']['sub']).first()
             user_id = user.id
 
             # Construct a dictionary for the PDF
@@ -403,15 +407,11 @@ def ferpa_request():
 
                  "PASSWORD": form.password.data,
                  "PEOPLESOFT": form.peoplesoft_id.data,
-                 "SIGNATURE": filepath,
+                 "SIGNATURE": latex_path,
                  "DATE": str(form.date.data)
             }
 
-            # Pass the dictionary to the function
             pdf_file = generate_ferpa(data)
-
-            # Function will return the pdf file name
-
             # Create the request
             new_request = Request(
                 user_id=user_id,
@@ -425,7 +425,7 @@ def ferpa_request():
 
             return redirect(url_for('user_requests'))
 
-    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    # Get permissions
     is_admin = any(role.name == 'admin' for role in user.roles)
     is_manager = any(role.name == 'manager' for role in user.roles)
 
@@ -438,6 +438,9 @@ def info_change_request():
 
     # Name/SSN change form
     form = InfoChangeForm()
+
+    # Get current user
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
 
     if form.validate_on_submit():
         # Ensure the user uploaded a signature
@@ -457,8 +460,10 @@ def info_change_request():
             unique_filename = str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower()
 
             # Save file with new name
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+            filepath = os.path.normpath(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
             file.save(filepath)
+
+            latex_path = filepath.replace("\\", "/")
 
             # Get user id from session
             user = User.query.filter_by(azure_id=session['user']['sub']).first()
@@ -474,22 +479,15 @@ def info_change_request():
                 "PEOPLESOFT": form.peoplesoft_id.data,
                 "EDIT_NAME": return_choice(choice, 'name'),
                 "EDIT_SSN": return_choice(choice, 'ssn'),
-                "FN_OLD": form.first_name_old.data,
-                "MN_OLD": form.middle_name_old.data,
-                "LN_OLD": form.last_name_old.data,
-                "SUF_OLD": form.suffix_old.data,
-                "FN_NEW": form.first_name_new.data,
-                "MN_NEW": form.middle_name_new.data,
-                "LN_NEW": form.last_name_new.data,
-                "SUF_NEW": form.suffix_new.data,
+                "FN_OLD": form.first_name_old.data, "MN_OLD": form.middle_name_old.data, "LN_OLD": form.last_name_old.data, "SUF_OLD": form.suffix_old.data,
+                "FN_NEW": form.first_name_new.data, "MN_NEW": form.middle_name_new.data, "LN_NEW": form.last_name_new.data, "SUF_NEW": form.suffix_new.data,
                 "OPT_MARITAL": return_choice(name_change_reason, 'marriage'),
                 "OPT_COURT": return_choice(name_change_reason, 'court'),
                 "OPT_ERROR_NAME": return_choice(name_change_reason, 'error'),
-                "SSN_OLD": form.ssn_old.data,
-                "SSN_NEW": form.ssn_new.data,
+                "SSN_OLD": form.ssn_old.data, "SSN_NEW": form.ssn_new.data,
                 "OPT_ERROR_SSN": return_choice(ssn_change_reason, 'error'),
                 "OPT_ADD_SSN": return_choice(ssn_change_reason, 'addition'),
-                "SIGNATURE": filepath,
+                "SIGNATURE": latex_path,
                 "DATE": str(form.date.data)}
 
             # Pass dictionary to function
@@ -508,8 +506,7 @@ def info_change_request():
             
             return redirect(url_for('user_requests'))
 
-    
-    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    # Check permissions
     is_admin = any(role.name == 'admin' for role in user.roles)
     is_manager = any(role.name == 'manager' for role in user.roles)
 
@@ -535,11 +532,9 @@ def about():
     if logged_in:
         user = User.query.filter_by(azure_id=session['user']['sub']).first()
         is_admin = any(role.name == 'admin' for role in user.roles)
-        return render_template('about.html', logged_in=logged_in, user=session['user'], is_admin=is_admin)
+        is_manager = any(role.name == 'manager' for role in user.roles)
 
-    
-    is_admin = any(role.name == 'admin' for role in user.roles)
-    is_manager = any(role.name == 'manager' for role in user.roles)
+        return render_template('about.html', logged_in=logged_in, user=session['user'], is_admin=is_admin)
 
     return render_template('about.html', logged_in=logged_in, is_admin=is_admin, is_manager=is_manager)
 
