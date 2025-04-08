@@ -31,7 +31,7 @@ class FERPAForm(FlaskForm):
     official_choices = SelectMultipleField("Select Officials", choices=[('registrar', 'Office of the University Registrar'),
         ('aid', 'Scholarships and Financial Aid'),
         ('financial', 'Student Financial Services'),
-        ('undergrad', 'Undergraduate Scholasr & US (formally USD)'),
+        ('undergrad', 'Undergraduate Scholars & US (formally USD)'),
         ('advancement', 'University Advancement'),
         ('dean', 'Dean of Students Office'),
         ('other', 'Other')], validators=[DataRequired()])
@@ -73,8 +73,9 @@ class FERPAForm(FlaskForm):
     signature = FileField('Upload Signature', validators=[DataRequired()])
     date = DateField('Birthdate', format='%Y-%m-%d', validators=[DataRequired()])
 
-    submit = SubmitField('Submit FERPA')
+    is_draft = BooleanField('Save as Draft?')
 
+    submit = SubmitField('Submit FERPA')
 
 class InfoChangeForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=25)])
@@ -101,8 +102,8 @@ class InfoChangeForm(FlaskForm):
         ('error', 'Correction of Error')])
 
     # Section B: SSN Change
-    ssn_old = StringField('Old SSN', validators=[Regexp(r"^\d{3}-\d{2}-\d{4}$", message="SSN must be in the format XXX-XX-XXXX")])
-    ssn_new = StringField('New SSN', validators=[Regexp(r"^\d{3}-\d{2}-\d{4}$", message="SSN must be in the format XXX-XX-XXXX")])
+    ssn_old = StringField('Old SSN', validators=[Regexp(r"^$|^\d{3}-\d{2}-\d{4}$", message="SSN must be in the format XXX-XX-XXXX")])
+    ssn_new = StringField('New SSN', validators=[Regexp(r"^$|^\d{3}-\d{2}-\d{4}$", message="SSN must be in the format XXX-XX-XXXX")])
 
     # Reason for SSN change checkbox
     ssn_change_reason = SelectMultipleField("Reason for SSN Change", choices=[('error', 'Correction of Error'),

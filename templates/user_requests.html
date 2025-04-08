@@ -9,87 +9,47 @@
 <h3 class="mb-3">Name/SSN Change</h3>
 <p>Click <a href="info_change">here</a> to fill out the name change/SSN form.</p>
 
-<!-- Pending -->
-<h2 class="mb-3">Pending</h2>
+<!-- FERPA -->
+<h2 class="mb-3">FERPA Requests</h2>
 <table class="table">
 	<thead>
 		<tr>
-			<th>Form</th>
+			<th>Status</th>
 			<th>Time Requested</th>
 			<th>File</th>
+			<th>Edit</th>
 		</tr>
 	</thead>
 	<tbody>
-		{% for request in pending_requests %}
+		{% for ferpa_request in ferpa_requests %}
 		<tr>
-			<td>{{ request.req_type }}</td>
-			<td>{{ request.time }}</td>
-			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">File</a></td>
+			<td>{{ ferpa_request.status }}</td>
+			<td>{{ ferpa_request.time }}</td>
+			<td><a href="{{ url_for('download_file', filename=ferpa_request.pdf_link) }}">File</a></td>
+			<td><a href="{{ url_for('edit_ferpa_request', ferpa_request_id=ferpa_request.id) }}">Edit</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>
 </table>
 
-<!-- Returned -->
-<h2 class="mb-3">Returned</h2>
+<!-- Info Change -->
+<h2 class="mb-3">Info Change Requests</h2>
 <table class="table">
 	<thead>
 		<tr>
-			<th>Form</th>
-			<th>Time Returned</th>
+			<th>Status</th>
+			<th>Time Requested</th>
 			<th>File</th>
 			<th>Edit</th>
 		</tr>
 	</thead>
 	<tbody>
-		{% for request in returned_requests %}
+		{% for infochange_request in infochange_requests %}
 		<tr>
-			<td>{{ request.req_type}}</td>
-			<td>{{ request.time }}</td>
+			<td>{{ infochange_request.status }}</td>
+			<td>{{ infochange_request.time }}</td>
 			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">File</a></td>
 			<td><a href="#">Edit</a></td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
-
-<!-- Draft -->
-<h2 class="mb-3">Draft</h2>
-<table class="table">
-	<thead>
-		<tr>
-			<th>Form</th>
-			<th>File</th>
-			<th>Edit</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for request in draft_requests %}
-		<tr>
-			<td>{{ request.req_type }}</td>
-			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">File</a></td>
-			<td><a href="#">Edit</a></td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
-
-<!-- Approved -->
-<h2 class="mb-3">Approved</h2>
-<table class="table">
-	<thead>
-		<tr>
-			<th>Form</th>
-			<th>Time Approved</th>
-			<th>File</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for request in approved_requests %}
-		<tr>
-			<td>{{ request.req_type }}</td>
-			<td>{{ request.time }}</td>
-			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">File</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>

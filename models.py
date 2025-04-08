@@ -29,26 +29,14 @@ class User(db.Model):
     roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
     active = db.Column(db.Boolean(), default=True)
 
-    requests = db.relationship('Request', back_populates='user', lazy=True)
+    ferpa_requests = db.relationship('FERPARequest', back_populates='user', lazy=True)
+    infochange_requests = db.relationship('InfoChangeRequest', back_populates='user', lazy=True)
 
     def has_role(self, role_name):
         return any(role.name == role_name for role in self.roles)
 
     def __repr__(self):
         return f"<User {self.name}>"
-
-# Requests model
-class Request (db.Model):
-    __tablename__ = 'requests'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    status = db.Column(db.String(10), nullable=False)
-    req_type = db.Column(db.String(15), nullable=False)
-    time = db.Column(db.DateTime, server_default=db.func.now())
-    pdf_link = db.Column(db.String(100), nullable=True)
-
-    user = db.relationship('User', back_populates='requests')
 
 class FERPARequest(db.Model):
     __tablename__ = 'ferpa_requests'
@@ -61,22 +49,34 @@ class FERPARequest(db.Model):
     time = db.Column(db.DateTime, server_default=db.func.now())
     pdf_link = db.Column(db.String(100), nullable=False)
 
+    # Name and campus
+    name = db.Column(db.String(25))
+    campus = db.Column(db.String(25))
+
     # Officials
-    official_choices = db.Column(db.String(25)) # comma-separated string
-    official_other = db.Column(db.String(25))
+    official_choices = db.Column(db.String(100)) # comma-separated string
+    official_other = db.Column(db.String(100))
 
     # Information
-    info_choices = db.Column(db.String(25)) # comma-separated string
-    info_other = db.Column(db.String(25))
+    info_choices = db.Column(db.String(100)) # comma-separated string
+    info_other = db.Column(db.String(100))
 
     # Release
-    release_choices = db.Column(db.String(25)) # comma-separated string
-    release_other = db.Column(db.String(25))
+    release_choices = db.Column(db.String(100)) # comma-separated string
+    release_other = db.Column(db.String(100))
 
-    # essential info
+    # Release and purpose
+    release_to = db.Column(db.String(50))
+    purpose = db.Column(db.String(25))
+    additional_names = db.Column(db.String(50))
+
+    # Essential info
     password = db.Column(db.String(25), nullable=False)
     peoplesoft_id = db.Column(db.String(25), nullable=False)
     date = db.Column(db.Date(), nullable=False)
+
+    # Relationship to User model
+    user = db.relationship('User', back_populates='ferpa_requests')
 
 class InfoChangeRequest(db.Model):
     __tablename__ = 'infochange_requests'
@@ -119,3 +119,7 @@ class InfoChangeRequest(db.Model):
 
     # Signature/Date
     date = db.Column(db.Date(), nullable=False)
+
+    # Relationship to User model
+
+    user = db.relationship('User', back_populates='infochange_requests')
