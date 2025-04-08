@@ -63,16 +63,12 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 @app.route('/')
 @app.route('/home')
 def home():
-    # Check if user is logged in
-    logged_in = session.get('logged_in', False)
-
-    if logged_in:
+    if session.get('logged_in', False):
         user = User.query.filter_by(azure_id=session['user']['sub']).first()
-        is_admin = any(role.name == 'admin' for role in user.roles)
-        is_manager = any(role.name == 'manager' for role in user.roles)
-        return render_template('index.html', logged_in=logged_in, user=session['user'], is_admin=is_admin, is_manager=is_manager)
+        roles = [role.name for role in user.roles]
+        return render_template('index.html', logged_in=True, roles=roles, user=session['user'])
 
-    return render_template('index.html', logged_in=logged_in)
+    return render_template('index.html', logged_in=False)
 
 ## MICROSOFT ENTRA AUTHENTICATION ##
 @app.route('/login')
@@ -127,17 +123,12 @@ def get_token():
 ## USER-SIDE MANAGEMENT ##
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    # Ensure the user is logged in
-    logged_in = session.get('logged_in', False)
-    if not logged_in:
+    # Ensure the user is logged in, get roles
+    if not session.get('logged_in', False):
         return redirect(url_for("login"))
     
-    # Get current user
-    user = User.query.filter_by(azure_id=session['user']['sub']).first()
-    is_admin = any(role.name == 'admin' for role in user.roles)
-    is_manager = any(role.name == 'manager' for role in user.roles)
-    
     # Ensure the user exists
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
     if not user:
         flash('User not found', 'error')
         return redirect(url_for("home"))
@@ -165,8 +156,12 @@ def profile():
             flash(f'Error updating profile: {str(e)}', 'error')
 
         return redirect(url_for("profile"))
+    
+    # Get current user and roles
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    roles = [role.name for role in user.roles]
 
-    return render_template('profile.html', form=form, logged_in=logged_in, is_admin=is_admin, is_manager=is_manager)
+    return render_template('profile.html', form=form, logged_in=True, roles=roles)
 
 ## ADMINISTRATOR MANAGEMENT ##
 
@@ -174,8 +169,14 @@ def profile():
 @app.route('/admin/users')
 @role_required('admin')
 def manage_users():
+    # Get users from database
     users = User.query.all()
-    return render_template('manage_users.html', users=users, logged_in=True, is_admin=True, is_manager=True)
+    
+    # Get current user roles
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    roles = [role.name for role in user.roles]
+    
+    return render_template('manage_users.html', users=users, logged_in=True, roles=roles)
 
 # Create new users
 @app.route('/admin/users/create', methods=['GET', 'POST'])
@@ -205,7 +206,11 @@ def create_user():
         flash('User created successfully', 'success')
         return redirect(url_for('manage_users'))
     
-    return render_template('create_user.html', form=form, logged_in=True, roles = Role.query.all(), is_admin=True, is_manager=True)
+    # Get current user roles
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    roles = [role.name for role in user.roles]
+    
+    return render_template('create_user.html', form=form, logged_in=True, roles=roles)
 
 # Update existing users
 @app.route('/admin/users/<int:user_id>/edit', methods=['GET', 'POST'])
@@ -229,8 +234,12 @@ def edit_user(user_id):
         db.session.commit()
         flash('User updated successfully.', 'success')
         return redirect(url_for('manage_users'))
+    
+    # Get current user and roles
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    roles = [role.name for role in user.roles]
 
-    return render_template('edit_user.html', form=form, user=user, logged_in=True, is_admin=True, is_manager=True)
+    return render_template('edit_user.html', form=form, user=user, logged_in=True, roles=roles)
 
 # Delete users
 @app.route('/admin/users/<int:user_id>/delete', methods=['POST'])
@@ -271,11 +280,16 @@ def manage_requests():
     pending_requests = Request.query.filter_by(status='pending').all()
     returned_requests = Request.query.filter_by(status='returned').all()
     approved_requests = Request.query.filter_by(status='approved').all()
+
+    # Get current user and roles
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    roles = [role.name for role in user.roles]
+
     return render_template('manage_requests.html', 
-                           pending_requests=pending_requests, 
-                           returned_requests=returned_requests,
-                           approved_requests=approved_requests,
-                           logged_in=True, is_admin=True, is_manager=True)
+        pending_requests=pending_requests, 
+        returned_requests=returned_requests,
+        approved_requests=approved_requests,
+        logged_in=True, roles=roles)
 
 @app.route('/manager/requests/approve/<int:request_id>', methods=['POST'])
 @role_required('manager')
@@ -314,16 +328,17 @@ def user_requests():
     completed_requests = Request.query.filter_by(user_id=user.id, status='completed').all()
     approved_requests = Request.query.filter_by(user_id=user.id, status='approved').all()
 
-    is_admin = any(role.name == 'admin' for role in user.roles)
-    is_manager = any(role.name == 'manager' for role in user.roles)
+    # Get current user and roles
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    roles = [role.name for role in user.roles]
 
     return render_template('user_requests.html',
-                           pending_requests=pending_requests,
-                           returned_requests=returned_requests,
-                           draft_requests=draft_requests,
-                           completed_requests=completed_requests,
-                           approved_requests=approved_requests,
-                           logged_in=True, is_admin=is_admin, is_manager=is_manager)
+        pending_requests=pending_requests,
+        returned_requests=returned_requests,
+        draft_requests=draft_requests,
+        completed_requests=completed_requests,
+        approved_requests=approved_requests,
+        logged_in=True, roles=roles)
 
 # FERPA form page
 @app.route('/user/requests/ferpa', methods=['GET', 'POST'])
@@ -368,8 +383,7 @@ def ferpa_request():
             release_choices = form.release_choices.data
 
             data = {
-                 "NAME": form.name.data,
-                 "CAMPUS": form.campus.data,
+                 "NAME": form.name.data, "CAMPUS": form.campus.data,
                  
                  "OPT_REGISTRAR": return_choice(official_choices, 'registrar'),
                  "OPT_AID": return_choice(official_choices, 'aid'),
@@ -392,10 +406,7 @@ def ferpa_request():
                  "OPT_OTHER_INFO": return_choice(info_choices, 'other'),
                  "OTHERINFO": form.info_other.data,
 
-                 "RELEASE": form.release_to.data,
-                 "PURPOSE": form.purpose.data,
-
-                 "ADDITIONALS": form.additional_names.data,
+                 "RELEASE": form.release_to.data, "PURPOSE": form.purpose.data, "ADDITIONALS": form.additional_names.data,
 
                  "OPT_FAMILY": return_choice(release_choices, 'family'),
                  "OPT_INSTITUTION": return_choice(release_choices, 'institution'),
@@ -405,10 +416,7 @@ def ferpa_request():
                  "OPT_OTHER_RELEASE": return_choice(release_choices, 'other'),
                  "OTHERRELEASE": form.release_other.data,
 
-                 "PASSWORD": form.password.data,
-                 "PEOPLESOFT": form.peoplesoft_id.data,
-                 "SIGNATURE": latex_path,
-                 "DATE": str(form.date.data)
+                 "PASSWORD": form.password.data, "PEOPLESOFT": form.peoplesoft_id.data, "SIGNATURE": latex_path, "DATE": str(form.date.data)
             }
 
             pdf_file = generate_ferpa(data)
@@ -425,11 +433,11 @@ def ferpa_request():
 
             return redirect(url_for('user_requests'))
 
-    # Get permissions
-    is_admin = any(role.name == 'admin' for role in user.roles)
-    is_manager = any(role.name == 'manager' for role in user.roles)
+    # Get current user and roles
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    roles = [role.name for role in user.roles]
 
-    return render_template('ferpa.html', form=form, logged_in=True, is_admin=is_admin, is_manager=is_manager)
+    return render_template('ferpa.html', form=form, logged_in=True, roles=roles)
 
 # SSN/Name change form page
 @app.route('/user/requests/info_change', methods=['GET', 'POST'])
@@ -506,11 +514,11 @@ def info_change_request():
             
             return redirect(url_for('user_requests'))
 
-    # Check permissions
-    is_admin = any(role.name == 'admin' for role in user.roles)
-    is_manager = any(role.name == 'manager' for role in user.roles)
+    # Get current user and roles
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
+    roles = [role.name for role in user.roles]
 
-    return render_template('info_change.html', form=form, logged_in=True, is_admin=is_admin, is_manager=is_manager)
+    return render_template('info_change.html', form=form, logged_in=True, roles=roles)
 
 # Route to download PDFs
 @app.route('/download/<filename>', methods=['GET'])
@@ -528,15 +536,14 @@ def download_file(filename):
 ## MISCELLANEOUS ##
 @app.route('/about')
 def about():
-    logged_in = session.get('logged_in', False)
-    if logged_in:
+    if session.get('logged_in', False):
+        # Get current user and roles
         user = User.query.filter_by(azure_id=session['user']['sub']).first()
-        is_admin = any(role.name == 'admin' for role in user.roles)
-        is_manager = any(role.name == 'manager' for role in user.roles)
+        roles = [role.name for role in user.roles]
 
-        return render_template('about.html', logged_in=logged_in, user=session['user'], is_admin=is_admin)
+        return render_template('about.html', logged_in=True, roles=roles)
 
-    return render_template('about.html', logged_in=logged_in, is_admin=is_admin, is_manager=is_manager)
+    return render_template('about.html', logged_in=False)
 
 @app.route('/logout')
 def logout():
@@ -546,15 +553,13 @@ def logout():
 @app.errorhandler(404)
 def page_not_found(error):
     
-    logged_in = session.get('logged_in', False)
-    is_admin=False
-    is_manager=False
-    if logged_in:
+    if session.get('logged_in', False):
         user = User.query.filter_by(azure_id=session['user']['sub']).first()
-        is_admin = any(role.name == 'admin' for role in user.roles)
-        is_manager = any(role.name == 'manager' for role in user.roles)
+        roles = [role.name for role in user.roles]
 
-    return render_template('404.html', logged_in=logged_in, is_admin=is_admin, is_manager=is_manager)
+        return render_template('404.html', logged_in=True, roles=roles)
+
+    return render_template('404.html', logged_in=False)
 
 ### APP & DATABASE INITIALIZATION ###
 

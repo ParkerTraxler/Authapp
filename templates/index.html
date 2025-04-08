@@ -3,14 +3,10 @@
 {% block content %}
 
 {% if logged_in %}
-
 	<p class="mt-4"> Greetings {{ user.name }}.</p>
 	<p> If you would like to change your account information, click "Profile" in the navigation bar above.</p>
-
 {% else %}
-
 	<p class="mt-4">Greetings.</p>
 	<p>You are not logged in. If you would like to login, click the Login link above.</p>
-
 {% endif %}
 {% endblock %}

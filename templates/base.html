@@ -22,13 +22,15 @@
 					{% if logged_in %}
 					    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
 						<li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}">Profile</a></li>
-						<li class="nav-item"><a class="nav-link" href="{{ url_for('user_requests') }}">Requests</a></li>
-						{% if is_admin %}
+						{% if 'user' in roles %}
+							<li class="nav-item"><a class="nav-link" href="{{ url_for('user_requests') }}">Requests</a></li>
+						{% endif %}
+						{% if 'admin' in roles %}
 							<!-- Edit and create users dashboards for administrators only -->
 							<li class="nav-item"><a class="nav-link" href="{{ url_for('manage_users') }}">Admin Dashboard</a></li>
 						{% endif %}
 
-						{% if is_manager %}
+						{% if 'manager' in roles %}
 							<li class="nav-item"><a class="nav-link" href="{{ url_for('manage_requests') }}">Manage Requests</a></li>
 						{% endif %}
 					
