@@ -57,7 +57,6 @@ def create_default_roles():
 os.makedirs(app.config['FORM_FOLDER'], exist_ok=True)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-### ROUTES ###
 
 # Display name of user if logged in or redirects to /login
 @app.route('/')
@@ -122,7 +121,7 @@ def get_token():
 
 ## USER-SIDE MANAGEMENT ##
 @app.route('/profile', methods=['GET', 'POST'])
-def profile():
+def profile():  
     # Ensure the user is logged in, get roles
     if not session.get('logged_in', False):
         return redirect(url_for("login"))
@@ -192,7 +191,7 @@ def create_user():
             name=form.name.data,
             email=form.email.data,
             active=form.active.data
-            )
+        )
 
         # Assign roles
         for role_id in form.roles.data:

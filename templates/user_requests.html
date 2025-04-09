@@ -23,9 +23,14 @@
 	<tbody>
 		{% for ferpa_request in ferpa_requests %}
 		<tr>
-			<td>{{ ferpa_request.status }}</td>
+			<td><span class="{% if ferpa_request.status == 'approved' %} text-success
+								{% elif ferpa_request.status == 'pending' %} text-warning
+								{% elif ferpa_request.status == 'draft' %} text-info
+								{% elif ferpa_request.status == 'rejected' %} text-danger
+								{% elif ferpa_request.status == 'returned' %} text-secondary {% endif %}">
+			{{ ferpa_request.status.capitalize() }}</span></td>
 			<td>{{ ferpa_request.time }}</td>
-			<td><a href="{{ url_for('download_file', filename=ferpa_request.pdf_link) }}">File</a></td>
+			<td><a href="{{ url_for('download_file', filename=ferpa_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
 			<td><a href="{{ url_for('edit_ferpa_request', ferpa_request_id=ferpa_request.id) }}">Edit</a></td>
 		</tr>
 		{% endfor %}
@@ -46,9 +51,14 @@
 	<tbody>
 		{% for infochange_request in infochange_requests %}
 		<tr>
-			<td>{{ infochange_request.status }}</td>
+			<td><span class="{% if infochange_request.status == 'approved' %} text-success
+				{% elif infochange_request.status == 'pending' %} text-warning
+				{% elif infochange_request.status == 'draft' %} text-info
+				{% elif infochange_request.status == 'rejected' %} text-danger
+				{% elif infochange_request.status == 'returned' %} text-secondary {% endif %}">
+				{{ infochange_request.status.capitalize() }}</span></td>
 			<td>{{ infochange_request.time }}</td>
-			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}">File</a></td>
+			<td><a href="{{ url_for('download_file', filename=request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
 			<td><a href="#">Edit</a></td>
 		</tr>
 		{% endfor %}
