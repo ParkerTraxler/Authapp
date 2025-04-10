@@ -90,7 +90,7 @@ class InfoChangeRequest(db.Model):
     time = db.Column(db.DateTime, server_default=db.func.now())
     pdf_link = db.Column(db.String(100), nullable=False)
     sig_link = db.Column(db.String(100))
-
+    
     # Name and ID
     name = db.Column(db.String(25), nullable=False)
     peoplesoft_id = db.Column(db.String(6), nullable=False)
@@ -113,8 +113,8 @@ class InfoChangeRequest(db.Model):
     nmchg_reason = db.Column(db.String(25))
 
     # Section B: SSN Change
-    ssn_new = db.Column(db.String(11))
     ssn_old = db.Column(db.String(11))
+    ssn_new = db.Column(db.String(11))
 
     # Reason for SSN change
     ssnchg_reason = db.Column(db.String(25))

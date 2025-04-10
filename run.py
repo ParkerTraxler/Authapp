@@ -1,8 +1,8 @@
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from app import create_app
 
-load_dotenv(override=True)
+load_dotenv()
 app = create_app()
 
 if __name__ == "__main__":

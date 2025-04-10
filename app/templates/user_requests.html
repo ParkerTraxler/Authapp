@@ -31,7 +31,7 @@
 			{{ ferpa_request.status.capitalize() }}</span></td>
 			<td>{{ ferpa_request.time }}</td>
 			<td><a href="{{ url_for('main.download_file', filename=ferpa_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
-			<td><a href="{{ url_for('user.edit_ferpa_request', ferpa_request_id=ferpa_request.id) }}">Edit</a></td>
+			<td><a href="{{ url_for('user.edit_ferpa_request', ferpa_request_id=ferpa_request.id) }}" class="btn btn-outline-primary btn-sm">Edit</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>
@@ -59,7 +59,7 @@
 				{{ infochange_request.status.capitalize() }}</span></td>
 			<td>{{ infochange_request.time }}</td>
 			<td><a href="{{ url_for('main.download_file', filename=infochange_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
-			<td><a href="#">Edit</a></td>
+			<td><a href="{{ url_for('user.edit_infochange_request', infochange_request_id=infochange_request.id) }}" class="btn btn-outline-primary btn-sm">Edit</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>

@@ -140,7 +140,7 @@ def edit_ferpa_request(ferpa_request_id):
     if not session.get('logged_in', False):
         return redirect(url_for("auth.login"))
     
-    # Ensure the user exists
+    # Ensure the request exists
     ferpa_request = FERPARequest.query.get_or_404(ferpa_request_id)
     if not ferpa_request:
         flash('FERPA request was not found.', 'error')
@@ -213,7 +213,7 @@ def edit_ferpa_request(ferpa_request_id):
 
             data = {
                  "NAME": form.name.data, "CAMPUS": form.campus.data,
-                 
+
                  "OPT_REGISTRAR": return_choice(official_choices, 'registrar'),
                  "OPT_AID": return_choice(official_choices, 'aid'),
                  "OPT_FINANCIAL": return_choice(official_choices, 'financial'),
@@ -251,7 +251,7 @@ def edit_ferpa_request(ferpa_request_id):
             # Generate PDF and store path
             pdf_file = generate_ferpa(data)
 
-            # Store options as comma-separate string
+            # Store options as comma-separated string
             official_choices = ",".join(form.official_choices.data)
             info_choices = ",".join(form.info_choices.data)
             release_choices = ",".join(form.release_choices.data)

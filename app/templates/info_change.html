@@ -108,6 +108,12 @@
 		{{ form.date(class="form-control") }}
 	</div>
 
+	<div class="mb-3">
+		<label for="is_draft" class="form-label"></label>
+		{{ form.is_draft(class="form-check-input") }}
+        {{ form.is_draft.label(class="form-check-label") }}
+	</div>
+
 	<button type="submit" class="btn btn-primary mt-3 mb-3">{{ form.submit.label }}</button>
 
 </form>

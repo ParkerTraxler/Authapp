@@ -113,4 +113,6 @@ class InfoChangeForm(FlaskForm):
     signature = FileField('Upload Signature', validators=[DataRequired()])
     date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
 
+    is_draft = BooleanField('Save as Draft?')
+
     submit = SubmitField('Submit SSN/Name Change')
