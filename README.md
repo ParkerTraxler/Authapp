@@ -1,6 +1,10 @@
 # EManage
 EManage is a management platform developed for COSC 4353.
 
+## Technologies
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+
 ## Getting Started ##
 The management system requires the MySQL DBMS. The latest version may be found [here](https://www.mysql.com/downloads/).
 
