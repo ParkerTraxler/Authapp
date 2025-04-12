@@ -22,7 +22,7 @@ The management system requires the MySQL DBMS. The latest version may be found [
    ```
 
 3. **Configuration:**
-   The software will read system environment variables or a .env file (in that order) to configure the application.\
+   The software will read system environment variables or a .env file (in that order) to configure the application.\\
    You must create an app registration in Azure to be able to create user accounts with Office365 accounts, which you can use to set these variables:
 
    ```sh
