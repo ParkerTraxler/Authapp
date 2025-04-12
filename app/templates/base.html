@@ -21,7 +21,6 @@
 					<!-- Display appropriate links depending on login status -->
 					{% if logged_in %}
 					    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
-						<li class="nav-item"><a class="nav-link" href="{{ url_for('user.profile') }}">Profile</a></li>
 						{% if 'user' in roles %}
 							<li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_requests') }}">Requests</a></li>
 						{% endif %}
@@ -41,6 +40,13 @@
 					<li class="nav-item"><a class="nav-link" href="/about">About</a></li>
                 </ul>
             </div>
+			{% if logged_in %}
+				<span class="navbar-text text-white ms-auto">
+					<a href="{{ url_for('user.profile') }}" class="text-white text-decoration-none">
+						{{ session['user']['name'] }}
+					</a>
+				</span>
+			{% endif %}
         </div>
     </nav>
 	

@@ -2,7 +2,8 @@
 {% block title %}Manage Profile{% endblock %}
 {% block content %}
 
-<h1>Manage User Information</h1>
+<h2>Hello, {{ session['user']['name'] }}.</h2>
+<h3 class="mt-5">Account Info</h3>
 
 <form method="POST" action="{{ url_for('user.profile') }}">
 	{{ form.hidden_tag() }}
