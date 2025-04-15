@@ -116,3 +116,47 @@ class InfoChangeForm(FlaskForm):
     is_draft = BooleanField('Save as Draft?')
 
     submit = SubmitField('Submit SSN/Name Change')
+
+class MedicalWithdrawalForm(FlaskForm):
+    
+    # Name/ID/College
+    name = StringField('Name', validators=[DataRequired(), Length(max=25)])
+    peoplesoft_id = StringField('UH ID', validators=[DataRequired(), Length(min=6, max=6)])
+    college = StringField('College', validators=[DataRequired(), Length(max=25)])
+    degree = StringField('Degree', validators=[DataRequired(), Length(max=25)])
+
+    # Address/Personal Info
+    city = StringField('City', validators=[DataRequired(), Length(max=25)])
+    state = StringField('State', validators=[DataRequired(), Length(max=25)])
+    zip_code = StringField('Zip Code', validators=[DataRequired(), Length(max=25)])
+    phone = StringField('Phone', validators=[DataRequired(), Length(max=12)])
+    email = StringField('Email', validators=[DataRequired(), Length(max=25)])
+
+    # Semester Info
+    term_year = StringField('Term/Year', validators=[DataRequired(), Length(max=10)])
+    last_attended = DateField('Last Attended', format='%Y-%m-%d', validators=[DataRequired()])
+
+    # Reason
+    reason = StringField('Reason', validators=[DataRequired(), Length(max=25)])
+    details = StringField('Details', validators=[Length(max=50)])
+
+    # Additional Info
+    financial_assistance = BooleanField('Financial Assistance')
+    uh_health_insurance = BooleanField('UH Health Insurance')
+    campus_housing = BooleanField('Campus Housing')
+    visa_status = BooleanField('Visa Status')
+    gi_bill_benefits = BooleanField('GI Benefits')
+
+    # Courses to be Withdrawn
+    subject = StringField('Subject', validators=[DataRequired(), Length(max=25)])
+    number = StringField('Course Number', validators=[DataRequired(), Length(max=4)])
+    section = StringField('Section Number', validators=[DataRequired(), Length(max=10)])
+
+    # Signature and date
+    signature = FileField('Upload Signature', validators=[DataRequired()])
+    date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
+    initial = StringField('Initial', validators=[DataRequired(), Length(max=5)])
+
+    is_draft = BooleanField('Save as Draft?')
+
+    submit = SubmitField('Submit SSN/Name Change')

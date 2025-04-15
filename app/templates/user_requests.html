@@ -8,6 +8,8 @@
 <p>Click <a href="ferpa">here</a> to fill out the FERPA form.</p>
 <h3 class="mb-3">Name/SSN Change</h3>
 <p>Click <a href="info_change">here</a> to fill out the name change/SSN form.</p>
+<h3 class="mb-3">Medical Withdrawal Request</h3>
+<p>Click <a href="medical_withdrawal">here</a> to fill out the medical withdrawal form.</p>
 
 <!-- FERPA -->
 <h2 class="mb-3">FERPA Requests</h2>
@@ -60,6 +62,34 @@
 			<td>{{ infochange_request.time }}</td>
 			<td><a href="{{ url_for('main.download_file', filename=infochange_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
 			<td><a href="{{ url_for('user.edit_infochange_request', infochange_request_id=infochange_request.id) }}" class="btn btn-outline-primary btn-sm">Edit</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<!-- Medical Withdrawal Requests -->
+<h2 class="mb-3">Medical Withdrawal Requests</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Status</th>
+			<th>Time Requested</th>
+			<th>File</th>
+			<th>Edit</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for withdrawal_request in withdrawal_requests %}
+		<tr>
+			<td><span class="{% if withdrawal_request.status == 'approved' %} text-success
+				{% elif withdrawal_request.status == 'pending' %} text-warning
+				{% elif withdrawal_request.status == 'draft' %} text-info
+				{% elif withdrawal_request.status == 'rejected' %} text-danger
+				{% elif withdrawal_request.status == 'returned' %} text-secondary {% endif %}">
+				{{ withdrawal_request.status.capitalize() }}</span></td>
+			<td>{{ withdrawal_request.time }}</td>
+			<td><a href="{{ url_for('main.download_file', filename=withdrawal_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
+			<td><a href="{{ url_for('user.edit_withdrawal_request', withdrawal_request_id=withdrawal_request.id) }}" class="btn btn-outline-primary btn-sm">Edit</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>

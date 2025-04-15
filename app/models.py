@@ -31,6 +31,7 @@ class User(db.Model):
 
     ferpa_requests = db.relationship('FERPARequest', back_populates='user', lazy=True)
     infochange_requests = db.relationship('InfoChangeRequest', back_populates='user', lazy=True)
+    withdrawal_requests = db.relationship('MedicalWithdrawalRequest', back_populates='user', lazy=True)
 
     def has_role(self, role_name):
         return any(role.name == role_name for role in self.roles)
@@ -124,3 +125,55 @@ class InfoChangeRequest(db.Model):
 
     # Relationship to User model
     user = db.relationship('User', back_populates='infochange_requests')
+
+class MedicalWithdrawalRequest(db.Model):
+    __tablename__ = 'withdrawal_requests'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Meta data
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    status = db.Column(db.String(10), nullable=False)
+    time = db.Column(db.DateTime, server_default=db.func.now())
+    pdf_link = db.Column(db.String(100), nullable=False)
+    sig_link = db.Column(db.String(100))
+    
+    # Name and ID
+    name = db.Column(db.String(25), nullable=False)
+    peoplesoft_id = db.Column(db.String(6), nullable=False)
+    college = db.Column(db.String(50), nullable=False)
+    degree = db.Column(db.String(50), nullable=False)
+    
+    # Address/Personal Info
+    city = db.Column(db.String(25), nullable=False)
+    state = db.Column(db.String(25), nullable=False)
+    zip_code = db.Column(db.String(25), nullable=False)
+    phone = db.Column(db.String(12), nullable=False)
+    email = db.Column(db.String(25), nullable=False)
+    
+    # Semester Info
+    term_year = db.Column(db.String(10), nullable=False)
+    last_attended = db.Column(db.Date(), nullable=False)
+
+    # Reason
+    reason = db.Column(db.String(25), nullable=False)
+    details = db.Column(db.String(100))
+
+    # Additional Information
+    financial_assistance = db.Column(db.String(3))
+    uh_health_insurance = db.Column(db.String(3))
+    campus_housing = db.Column(db.String(3))
+    visa_status = db.Column(db.String(3))
+    gi_bill_benefits = db.Column(db.String(3))
+
+    # Course to be Withdrawn
+    subject = db.Column(db.String(25), nullable=False)
+    number = db.Column(db.String(4), nullable=False)
+    section = db.Column(db.String(10), nullable=False)
+
+    # Date and Initial
+    date = db.Column(db.Date(), nullable=False)
+    initial = db.Column(db.String(5), nullable=False)
+
+    # Relationship to User model
+    user = db.relationship('User', back_populates='withdrawal_requests')

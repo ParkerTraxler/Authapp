@@ -88,4 +88,45 @@
 </table>
 </table>
 
+<!-- Medical Withdrawal -->
+<h3 class="mb-3">Medical Withdrawal Requests</h3>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Status</th>
+			<th>Time Requested</th>
+			<th>File</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for withdrawal_request in withdrawal_requests %}
+		<tr>
+			<td><span class="{% if withdrawal_request.status == 'approved' %} text-success
+				{% elif withdrawal_request.status == 'pending' %} text-warning
+				{% elif withdrawal_request.status == 'draft' %} text-info
+				{% elif withdrawal_request.status == 'rejected' %} text-danger
+				{% elif withdrawal_request.status == 'returned' %} text-secondary {% endif %}">
+				{{ withdrawal_request.status.capitalize() }}</span></td>	
+			<td>{{ withdrawal_request.time }}</td>
+			<td><a href="{{ url_for('main.download_file', filename=withdrawal_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
+			<td>
+				{% if withdrawal_request.status != "approved" and withdrawal_request.status != "returned" and withdrawal_request.status != "rejected" %}
+                <form action="{{ url_for('manager.approve_withdrawal_request', id=withdrawal_request.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-success">Approve</button>
+                </form>
+                <form action="{{ url_for('manager.return_withdrawal_request', id=withdrawal_request.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-warning">Return</button>
+                </form>
+				<form action="{{ url_for('manager.reject_withdrawal_request', id=withdrawal_request.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </form>
+				{% else %} No actions available.
+				{% endif %}
+            </td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
 {% endblock %}

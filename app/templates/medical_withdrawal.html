@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}Medical Withdrawal{% endblock %}
+{% block content %}
+<h1 class="mb-3">Medical Withdrawal Form</h1>
+
+<form method="POST" enctype="multipart/form-data">
+	{{ form.hidden_tag() }}
+
+	<!-- Name -->
+	<div class="mb-3">
+		<label for="name" class="form-label">Name</label>
+		{{ form.name(class="form-control") }}
+	</div>
+
+	<!-- PeopleSoft ID -->
+	<div class="mb-3">
+		<label for="peoplesoft_id" class="form-label">myUH ID</label>
+		{{ form.peoplesoft_id(class="form-control") }}
+	</div>
+
+	<!-- College -->
+	<div class="mb-3">
+		<label for="college" class="form-label">College</label>
+		{{ form.college(class="form-control") }}
+	</div>
+
+	<!-- Degree -->
+	<div class="mb-3">
+		<label for="degree" class="form-label">Degree</label>
+		{{ form.degree(class="form-control") }}
+	</div>
+
+	<!-- City, State, Zip -->
+	<div class="mb-3">
+		<label for="city" class="form-label">City</label>
+		{{ form.city(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="state" class="form-label">State</label>
+		{{ form.state(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="zip_code" class="form-label">Zip</label>
+		{{ form.zip_code(class="form-control") }}
+	</div>
+
+	<!-- Phone, Email -->
+	<div class="mb-3">
+		<label for="phone" class="form-label">Phone</label>
+		{{ form.phone(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="email" class="form-label">Email</label>
+		{{ form.email(class="form-control") }}
+	</div>
+
+	<!-- Semester Info -->
+	<div class="mb-3">
+		<label for="term_year" class="form-label">Term and Year</label>
+		{{ form.term_year(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="last_attended" class="form-label">Date of Last Attendance</label>
+		{{ form.last_attended(class="form-control") }}
+	</div>
+
+	<!-- Reason -->
+	<div class="mb-3">
+		<label for="reason" class="form-label">Reason for Withdrawal</label>
+		{{ form.reason(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="details" class="form-label">Additional Details</label>
+		{{ form.details(class="form-control") }}
+	</div>
+
+	<!-- Additional Info -->
+	<div class="mb-3">
+		{{ form.financial_assistance(class="form-check-input") }}
+        {{ form.financial_assistance.label(class="form-check-label") }}
+	</div>
+
+	<div class="mb-3">
+		{{ form.uh_health_insurance(class="form-check-input") }}
+        {{ form.uh_health_insurance.label(class="form-check-label") }}
+	</div>
+
+	<div class="mb-3">
+		{{ form.campus_housing(class="form-check-input") }}
+        {{ form.campus_housing.label(class="form-check-label") }}
+	</div>
+
+	<div class="mb-3">
+		{{ form.visa_status(class="form-check-input") }}
+        {{ form.visa_status.label(class="form-check-label") }}
+	</div>
+
+	<div class="mb-3">
+		{{ form.gi_bill_benefits(class="form-check-input") }}
+        {{ form.gi_bill_benefits.label(class="form-check-label") }}
+	</div>
+
+	<!-- Courses to be Withdrawn -->
+	<div class="mb-3">
+		<label for="subject" class="form-label">Subject</label>
+		{{ form.subject(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="number" class="form-label">Course Number</label>
+		{{ form.number(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="section" class="form-label">Section Number</label>
+		{{ form.section(class="form-control") }}
+	</div>
+
+	<h3 class="mb-3">Sign and Date</h3>
+	<!-- Signature (File Upload) -->
+	<div class="mb-3">
+		<label for="signature" class="form-label">Signature</label>
+		{{ form.signature(class="form-control") }}
+	</div>
+
+	<!-- Date -->
+	<div class="mb-3">
+		<label for="date" class="form-label">Date</label>
+		{{ form.date(class="form-control") }}
+	</div>
+
+	<!-- Initial -->
+	<div class="mb-3">
+		<label for="date" class="form-label">Initial</label>
+		{{ form.initial(class="form-control") }}
+	</div>
+
+	<!-- Is it a draft? -->
+	<div class="mb-3">
+		<label for="is_draft" class="form-label"></label>
+		{{ form.is_draft(class="form-check-input") }}
+        {{ form.is_draft.label(class="form-check-label") }}
+	</div>
+
+	<button type="submit" class="btn btn-primary mt-3 mb-3">{{ form.submit.label }}</button>
+
+</form>
+{% endblock %}
