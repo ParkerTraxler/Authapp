@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Student Drop{% endblock %}
+{% block content %}
+<h1 class="mb-3">Student Drop Form</h1>
+
+<form method="POST" enctype="multipart/form-data">
+	{{ form.hidden_tag() }}
+
+	<!-- Name/Birthdate -->
+	<div class="mb-3">
+		<label for="name" class="form-label">Name</label>
+		{{ form.name(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="name" class="form-label">Birthdate</label>
+		{{ form.birthdate(class="form-control") }}
+	</div>
+
+	<!-- PeopleSoft ID -->
+	<div class="mb-3">
+		<label for="peoplesoft_id" class="form-label">myUH ID</label>
+		{{ form.peoplesoft_id(class="form-control") }}
+	</div>
+
+	<!-- Semester Info -->
+	<div class="mb-3">
+		<label for="term_year" class="form-label">Term and Year</label>
+		{{ form.term_year(class="form-control") }}
+	</div>
+
+
+	<!-- Course to be Withdrawn -->
+	<div class="mb-3">
+		<label for="subject" class="form-label">Subject</label>
+		{{ form.subject(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="number" class="form-label">Course Number</label>
+		{{ form.number(class="form-control") }}
+	</div>
+
+	<div class="mb-3">
+		<label for="section" class="form-label">Section Number</label>
+		{{ form.section(class="form-control") }}
+	</div>
+
+	<h3 class="mb-3">Sign and Date</h3>
+	<!-- Signature (File Upload) -->
+	<div class="mb-3">
+		<label for="signature" class="form-label">Signature</label>
+		{{ form.signature(class="form-control") }}
+	</div>
+
+	<!-- Date -->
+	<div class="mb-3">
+		<label for="date" class="form-label">Date</label>
+		{{ form.date(class="form-control") }}
+	</div>
+
+	<!-- Is it a draft? -->
+	<div class="mb-3">
+		<label for="is_draft" class="form-label"></label>
+		{{ form.is_draft(class="form-check-input") }}
+        {{ form.is_draft.label(class="form-check-label") }}
+	</div>
+
+	<button type="submit" class="btn btn-primary mt-3 mb-3">{{ form.submit.label }}</button>
+
+</form>
+{% endblock %}

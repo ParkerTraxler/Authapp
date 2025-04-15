@@ -1,0 +1,83 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{color}
+\usepackage{enumitem}
+\usepackage{lastpage}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  filecolor=blue,
+  urlcolor=blue,
+}
+
+\setlength{\parindent}{0pt}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+
+\fancyfoot[C]{University of Houston - Student-Initiated Drop Form - Page \thepage\ of \pageref{LastPage}}
+
+\begin{document}
+
+\begin{center}
+  \textbf{\Large University of Houston}\\[0.2cm]
+  \textbf{\large Student-Initiated Drop Request Form}\\[0.2cm]
+\end{center}
+
+\hrule
+\vspace{0.5cm}
+
+\noindent\textit{Use a separate form for each class to be dropped. Use this form for drop after the Official Reporting Date (ORD). See Academic Calendar at www.uh.edu/academics for specific date.}
+\noindent\textit{Use a black ink pen or a number 2 pencil only. You are responsible for the accuracy of information entered on this form. The effective date is the date the completed form is processed by RAR but no later than the last day to drop with a grade of W. Dropping a course does not guarantee a refund of any portion of your tuition fees.}
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+\section*{1. Student Information}
+\begin{tabular}{ll}
+Name: & \textbf{ {{NAME}} } \\
+myUH ID: & \textbf{ {{PEOPLESOFT}} } \\
+Date of Birth: & \textbf{ {{BIRTHDATE} }}
+\end{tabular}
+
+\section*{2. Term Information}
+\begin{tabular}{ll}
+Term \& Year for Withdrawal: & \textbf{ {{TERMYEAR}} } \\
+\end{tabular}
+
+\section*{3. Course to Drop}
+\begin{tabular}{lll}
+\textbf{Subject} & \textbf{Number} & \textbf{Section} \\
+\hline
+{{SUBJECT}} & {{NUMBER}} & {{SECTION}} \\
+\end{tabular}
+
+\vspace{0.5cm}
+
+\section*{Instructor Signature Required}
+\noindent\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule}{I am aware this student is requesting to be dropped from my class.}}
+\begin{tabular}{ll}
+  Signature: & \\
+  Date: & \\
+\end{tabular}
+
+\section*{Student Signature and Acknowledgement}
+\noindent\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule}{I acknowledge that I am allowed a maximum of six (6) drops resulting in a grade of a W. If this drop request is my seventh (7th) or greater, I will not be granted the drop and may receive a grade of F. It is my responsibility to login to My PeopleSoft to verify this drop request has been processed. All Business students, international students, and student athletes should see their academic advisor prior to dropping courses.}}
+
+\vspace{0.5cm}
+
+\section*{Student Signature}
+\begin{tabular}{ll}
+% Signature: & \includegraphics[width=5cm]{ {{SIGNATURE}} } \\
+Date: & \textbf{ {{DATE}} } \\
+\end{tabular}
+
+\label{LastPage}
+\end{document}

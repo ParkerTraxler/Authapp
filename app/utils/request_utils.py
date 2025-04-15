@@ -99,3 +99,32 @@ def generate_withdrawal(data):
 
     # Return the generated PDF
     return pdf_file_path
+
+
+def generate_drop(data):
+    # Custom LaTeX file path
+    STUDENT_DROP_FILE = os.path.join(current_app.config['BASE_DIR'], 'uploads', 'form-templates', 'student_drop.tex')
+
+    # Generate unique ID for the PDF
+    unique_id = str(uuid.uuid4())
+
+    # Unique file paths
+    tex_file_path = os.path.join(current_app.config['FORM_FOLDER'], f"drop_form_{unique_id}.tex")
+    pdf_file_path = f"drop_form_{unique_id}.pdf"
+
+    # Read the LaTeX template and replace placeholders
+    with open(STUDENT_DROP_FILE, "r") as file:
+        latex_content = file.read()
+
+    for key, value in data.items():
+        latex_content = latex_content.replace(f"{{{{{key}}}}}", value)
+    
+    # Save the modified LaTeX file
+    with open(tex_file_path, "w") as file:
+        file.write(latex_content)
+
+    # Compile
+    subprocess.run(["pdflatex", "-interaction=nonstopmode", "-output-directory", current_app.config['FORM_FOLDER'], tex_file_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # Return the generated PDF
+    return pdf_file_path

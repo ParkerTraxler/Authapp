@@ -1,6 +1,6 @@
 from flask import redirect, render_template, session, flash, url_for, request
 from app.forms import ProfileForm
-from app.models import User, FERPARequest, InfoChangeRequest, MedicalWithdrawalRequest, db
+from app.models import User, FERPARequest, InfoChangeRequest, MedicalWithdrawalRequest, StudentDropRequest, db
 from app.user import user_bp
 from app.auth.role_required import role_required
 
@@ -58,6 +58,7 @@ def user_requests():
     ferpa_requests = FERPARequest.query.filter_by(user_id=user.id).all()
     infochange_requests = InfoChangeRequest.query.filter_by(user_id=user.id).all()
     withdrawal_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user.id).all()
+    drop_requests = StudentDropRequest.query.filter_by(user_id=StudentDropRequest.status != "draft").all()
 
     # Get current user and roles
     user = User.query.filter_by(azure_id=session['user']['sub']).first()
@@ -67,4 +68,5 @@ def user_requests():
         ferpa_requests=ferpa_requests,
         infochange_requests=infochange_requests,
         withdrawal_requests=withdrawal_requests,
+        drop_requests=drop_requests,
         logged_in=True, roles=roles)

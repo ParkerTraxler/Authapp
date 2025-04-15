@@ -160,3 +160,26 @@ class MedicalWithdrawalForm(FlaskForm):
     is_draft = BooleanField('Save as Draft?')
 
     submit = SubmitField('Submit SSN/Name Change')
+
+
+class StudentDropForm(FlaskForm):
+    # Name/ID/College
+    name = StringField('Name', validators=[DataRequired(), Length(max=25)])
+    peoplesoft_id = StringField('UH ID', validators=[DataRequired(), Length(min=6, max=6)])
+    birthdate = DateField('Birth Date', validators=[DataRequired()])
+
+    # Semester Info
+    term_year = StringField('Term/Year', validators=[DataRequired(), Length(max=10)])
+
+    # Courses to be Withdrawn
+    subject = StringField('Subject', validators=[DataRequired(), Length(max=25)])
+    number = StringField('Course Number', validators=[DataRequired(), Length(max=4)])
+    section = StringField('Section Number', validators=[DataRequired(), Length(max=10)])
+
+    # Signature and date
+    signature = FileField('Upload Signature', validators=[DataRequired()])
+    date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
+
+    is_draft = BooleanField('Save as Draft?')
+
+    submit = SubmitField('Submit SSN/Name Change')
