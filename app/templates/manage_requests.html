@@ -5,161 +5,39 @@
 
 <h2 class="mb-3">Request Management</h2>
 
-<!-- FERPA -->
+<!-- Approve, reject, or return requests -->
 <h3 class="mb-3">FERPA Requests</h3>
 <table class="table">
 	<thead>
 		<tr>
 			<th>Status</th>
-			<th>Time Requested</th>
+			<th>Type<th>
+			<th>Time</th>
 			<th>File</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
-		{% for ferpa_request in ferpa_requests %}
+		{% for request in requests %}
 		<tr>
-			<td><span class="{% if ferpa_request.status == 'approved' %} text-success
-				{% elif ferpa_request.status == 'pending' %} text-warning
-				{% elif ferpa_request.status == 'draft' %} text-info
-				{% elif ferpa_request.status == 'rejected' %} text-danger
-				{% elif ferpa_request.status == 'returned' %} text-secondary {% endif %}">
-				{{ ferpa_request.status.capitalize() }}</span></td>	
-			<td>{{ ferpa_request.time }}</td>
-			<td><a href="{{ url_for('main.download_file', filename=ferpa_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
+			<td><span class="{% if request.status == 'approved' %} text-success
+				{% elif request.status == 'pending' %} text-warning
+				{% elif request.status == 'draft' %} text-info
+				{% elif request.status == 'rejected' %} text-danger
+				{% elif request.status == 'returned' %} text-secondary {% endif %}">
+				{{ request.status.capitalize() }}</span></td>
+			<td>{{ request.request_type.capitalize() }}
+			<td>{{ request.time }}</td>
+			<td><a href="{{ url_for('main.download_file', filename=request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
 			<td>
-				{% if ferpa_request.status != "approved" and ferpa_request.status != "returned" and ferpa_request.status != "rejected" %}
-                <form action="{{ url_for('manager.approve_ferpa_request', id=ferpa_request.id) }}" method="post" style="display:inline;">
+				{% if request.status != "approved" and request.status != "returned" and request.status != "rejected" %}
+                <form action="{{ url_for('manager.approve_request', id=request.id) }}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-success">Approve</button>
                 </form>
-                <form action="{{ url_for('manager.return_ferpa_request', id=ferpa_request.id) }}" method="post" style="display:inline;">
+                <form action="{{ url_for('manager.return_request', id=request.id) }}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-warning">Return</button>
                 </form>
-				<form action="{{ url_for('manager.reject_ferpa_request', id=ferpa_request.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-danger">Reject</button>
-                </form>
-				{% else %} No actions available.
-				{% endif %}
-            </td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
-
-<!-- Info Change -->
-<h3 class="mb-3">Name/SSN Change Requests</h3>
-<table class="table">
-	<thead>
-		<tr>
-			<th>Status</th>
-			<th>Time Requested</th>
-			<th>File</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for infochange_request in infochange_requests %}
-		<tr>
-			<td><span class="{% if infochange_request.status == 'approved' %} text-success
-				{% elif infochange_request.status == 'pending' %} text-warning
-				{% elif infochange_request.status == 'draft' %} text-info
-				{% elif infochange_request.status == 'rejected' %} text-danger
-				{% elif infochange_request.status == 'returned' %} text-secondary {% endif %}">
-				{{ infochange_request.status.capitalize() }}</span></td>
-			<td>{{ infochange_request.time }}</td>
-			<td><a href="{{ url_for('main.download_file', filename=infochange_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
-			<td>
-				{% if infochange_request.status != "approved" and infochange_request.status != "returned" and infochange_request.status != "rejected" %}
-                <form action="{{ url_for('manager.approve_infochange_request', id=infochange_request.id) }}" method="post" style="display:inline;">
-					<button type="submit" class="btn btn-success">Approve</button>
-                </form>
-                <form action="{{ url_for('manager.return_infochange_request', id=infochange_request.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-warning">Return</button>
-                </form>
-				<form action="{{ url_for('manager.reject_infochange_request', id=infochange_request.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-danger">Reject</button>
-                </form>
-				{% else %} No action available.
-				{% endif %}
-            </td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
-</table>
-
-<!-- Medical Withdrawal -->
-<h3 class="mb-3">Medical Withdrawal Requests</h3>
-<table class="table">
-	<thead>
-		<tr>
-			<th>Status</th>
-			<th>Time Requested</th>
-			<th>File</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for withdrawal_request in withdrawal_requests %}
-		<tr>
-			<td><span class="{% if withdrawal_request.status == 'approved' %} text-success
-				{% elif withdrawal_request.status == 'pending' %} text-warning
-				{% elif withdrawal_request.status == 'draft' %} text-info
-				{% elif withdrawal_request.status == 'rejected' %} text-danger
-				{% elif withdrawal_request.status == 'returned' %} text-secondary {% endif %}">
-				{{ withdrawal_request.status.capitalize() }}</span></td>	
-			<td>{{ withdrawal_request.time }}</td>
-			<td><a href="{{ url_for('main.download_file', filename=withdrawal_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
-			<td>
-				{% if withdrawal_request.status != "approved" and withdrawal_request.status != "returned" and withdrawal_request.status != "rejected" %}
-                <form action="{{ url_for('manager.approve_withdrawal_request', id=withdrawal_request.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-success">Approve</button>
-                </form>
-                <form action="{{ url_for('manager.return_withdrawal_request', id=withdrawal_request.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-warning">Return</button>
-                </form>
-				<form action="{{ url_for('manager.reject_withdrawal_request', id=withdrawal_request.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-danger">Reject</button>
-                </form>
-				{% else %} No actions available.
-				{% endif %}
-            </td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
-
-<!-- Student Drops -->
-<h3 class="mb-3">Student Drop Requests</h3>
-<table class="table">
-	<thead>
-		<tr>
-			<th>Status</th>
-			<th>Time Requested</th>
-			<th>File</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for drop_request in drop_requests %}
-		<tr>
-			<td><span class="{% if drop_request.status == 'approved' %} text-success
-				{% elif drop_request.status == 'pending' %} text-warning
-				{% elif drop_request.status == 'draft' %} text-info
-				{% elif drop_request.status == 'rejected' %} text-danger
-				{% elif drop_request.status == 'returned' %} text-secondary {% endif %}">
-				{{ drop_request.status.capitalize() }}</span></td>	
-			<td>{{ drop_request.time }}</td>
-			<td><a href="{{ url_for('main.download_file', filename=drop_request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
-			<td>
-				{% if drop_request.status != "approved" and drop_request.status != "returned" and drop_request.status != "rejected" %}
-                <form action="{{ url_for('manager.approve_drop_request', id=drop_request.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-success">Approve</button>
-                </form>
-                <form action="{{ url_for('manager.return_drop_request', id=drop_request.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-warning">Return</button>
-                </form>
-				<form action="{{ url_for('manager.reject_drop_request', id=drop_request.id) }}" method="post" style="display:inline;">
+				<form action="{{ url_for('manager.reject_request', id=request.id) }}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-danger">Reject</button>
                 </form>
 				{% else %} No actions available.
