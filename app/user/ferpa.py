@@ -1,6 +1,6 @@
 import os, uuid
 from flask import request, session, render_template, flash, redirect, url_for, current_app
-from app.models import User, FERPARequest, db
+from app.models import User, Request, RequestType, db
 from app.auth.role_required import role_required
 from app.forms import FERPAForm
 from app.user import user_bp
@@ -88,40 +88,21 @@ def ferpa_request():
             # Generate PDF and store path
             pdf_file = generate_ferpa(data)
 
-            # Store options as comma-separate string
-            official_choices = ",".join(form.official_choices.data)
-            info_choices = ",".join(form.info_choices.data)
-            release_choices = ",".join(form.release_choices.data)
-
-            if form.is_draft.data:
-                status = "draft"
-            else:
-                status = "pending"
+            if form.is_draft.data: status = "draft"
+            else: status = "pending"
             
             # Create new FERPA request
-            new_ferpa_request = FERPARequest(
+            new_request = Request(
                 user_id=user_id,
                 status=status,
+                request_type=RequestType.FERPA,
                 pdf_link=pdf_file,
                 sig_link=unique_filename,
-                name=data['NAME'],
-                campus=data['CAMPUS'],
-                official_choices=official_choices,
-                official_other=data['OTHEROFFICIALS'],
-                info_choices=info_choices,
-                info_other=data['OTHERINFO'],
-                release_choices=release_choices,
-                release_other=data['OTHERRELEASE'],
-                release_to=data['RELEASE'],
-                purpose=data['PURPOSE'],
-                additional_names=data['ADDITIONALS'],
-                password=data['PASSWORD'],
-                peoplesoft_id=data['PEOPLESOFT'],
-                date=data['DATE']
+                form_data=data
             )
 
             # Commit FERPA request to database
-            db.session.add(new_ferpa_request)
+            db.session.add(new_request)
             db.session.commit()
 
             return redirect(url_for('user.user_requests'))
@@ -141,7 +122,7 @@ def edit_ferpa_request(ferpa_request_id):
         return redirect(url_for("auth.login"))
     
     # Ensure the request exists
-    ferpa_request = FERPARequest.query.get_or_404(ferpa_request_id)
+    ferpa_request = Request.query.get_or_404(ferpa_request_id)
     if not ferpa_request:
         flash('FERPA request was not found.', 'error')
         return redirect(url_for("user.user_requests"))
@@ -158,28 +139,65 @@ def edit_ferpa_request(ferpa_request_id):
 
     # Create form, populate with user data
     form = FERPAForm()
+    
+    # Parse form data from request, populate fields in draft form
+    data = ferpa_request.form_data
 
-    # Populate non-choice fields from database
+    official_options = {'OPT_REGISTRAR': 'registrar',
+                         'OPT_AID': 'aid', 
+                         'OPT_FINANCIAL': 'financial', 
+                         'OPT_UNDERGRAD': 'undergrad', 
+                         'OPT_ADVANCEMENT': 'advancement', 
+                         'OPT_DEAN': 'dean', 
+                         'OPT_OTHER_OFFICIALS': 'other'}
+    
+    official_choices = [value for opt, value in official_options.items()
+                        if data.get(opt) == "yes"]
+    
+    info_options = {'OPT_ACADEMIC_INFO': 'advising',
+                    'OPT_UNIVERSITY_RECORDS': 'all_records',
+                    'OPT_ACADEMIC_RECORDS': 'academics',
+                    'OPT_BILLING': 'billing',
+                    'OPT_DISCIPLINARY': 'disciplinary',
+                    'OPT_TRANSCRIPTS': 'transcripts',
+                    'OPT_HOUSING': 'housing',
+                    'OPT_PHOTOS': 'photos',
+                    'OPT_SCHOLARSHIP': 'scholarship',
+                    'OPT_OTHER_INFO': 'other'}
+    
+    info_choices = [value for opt, value in info_options.items()
+                    if data.get(opt) == "yes"]
+    
+    release_options = {'OPT_FAMILY': 'family',
+                       'OPT_INSTITUTION': 'institution',
+                       'OPT_HONOR': 'award',
+                       'OPT_EMPLOYER': 'employer',
+                       'OPT_PUBLIC': 'media',
+                       'OPT_OTHER_RELEASE': 'other'}
+    
+    release_choices = [value for opt, value in release_options.items()
+                       if data.get(opt) == "yes"]
+
     if request.method == 'GET':
-        form.name.data = ferpa_request.name
-        form.campus.data = ferpa_request.campus
+        form.name.data = data['NAME']
+        form.campus.data = data['CAMPUS']
 
-        form.official_choices.data = ferpa_request.official_choices.split(',')
-        form.official_other.data = ferpa_request.official_other
+        form.official_choices.data = official_choices
+        form.official_other.data = data['OTHEROFFICIALS']
 
-        form.info_choices.data = ferpa_request.info_choices.split(',')
-        form.info_other.data = ferpa_request.info_other
+        form.info_choices.data = info_choices
+        form.info_other.data = data['OTHERINFO']
 
-        form.release_choices.data = ferpa_request.release_choices.split(',')
-        form.release_other.data = ferpa_request.release_other
+        form.release_choices.data = release_choices
+        form.release_other.data = data['OTHERRELEASE']
 
-        form.release_to.data = ferpa_request.release_to
-        form.purpose.data = ferpa_request.purpose
-        form.additional_names.data = ferpa_request.additional_names
+        form.release_to.data = data['RELEASE']
+        form.purpose.data = data['PURPOSE']
+        form.additional_names.data = data['ADDITIONALS']
 
-        form.password.data = ferpa_request.password
-        form.peoplesoft_id.data = ferpa_request.peoplesoft_id
-        form.date.data = ferpa_request.date
+        form.password.data = data['PASSWORD']
+        form.peoplesoft_id.data = data['PEOPLESOFT']
+        form.date.data = data['DATE']
 
     # Handle form submission
     if form.validate_on_submit():
@@ -249,12 +267,7 @@ def edit_ferpa_request(ferpa_request_id):
             }
 
             # Generate PDF and store path
-            pdf_file = generate_ferpa(data)
-
-            # Store options as comma-separated string
-            official_choices = ",".join(form.official_choices.data)
-            info_choices = ",".join(form.info_choices.data)
-            release_choices = ",".join(form.release_choices.data)
+            pdf_link = generate_ferpa(data)
 
             if form.is_draft.data:
                 status = "draft"
@@ -263,21 +276,8 @@ def edit_ferpa_request(ferpa_request_id):
             
             # Update attributes of request
             ferpa_request.status = status
-            ferpa_request.pdf_link = pdf_file,
-            ferpa_request.name = data['NAME']
-            ferpa_request.campus = data['CAMPUS']
-            ferpa_request.official_choices = official_choices
-            ferpa_request.official_other = data['OTHEROFFICIALS']
-            ferpa_request.info_choices = info_choices
-            ferpa_request.info_other = data['OTHERINFO']
-            ferpa_request.release_choices = release_choices
-            ferpa_request.release_other = data['OTHERRELEASE']
-            ferpa_request.release_to = data['RELEASE']
-            ferpa_request.purpose = data['PURPOSE']
-            ferpa_request.additional_names = data['ADDITIONALS']
-            ferpa_request.password = data['PASSWORD']
-            ferpa_request.peoplesoft_id = data['PEOPLESOFT']
-            ferpa_request.date = form.date.data
+            ferpa_request.pdf_link = pdf_link
+            ferpa_request.form_data = data
 
             # Commit FERPA request to database
             db.session.commit()

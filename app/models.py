@@ -1,3 +1,4 @@
+import enum
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -29,60 +30,23 @@ class User(db.Model):
     roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
     active = db.Column(db.Boolean(), default=True)
 
-    ferpa_requests = db.relationship('FERPARequest', back_populates='user', lazy=True)
-    infochange_requests = db.relationship('InfoChangeRequest', back_populates='user', lazy=True)
-    withdrawal_requests = db.relationship('MedicalWithdrawalRequest', back_populates='user', lazy=True)
-    drop_requests = db.relationship('StudentDropRequest', back_populates='user', lazy=True)
-
+    requests = db.relationship('Request', back_populates='user', lazy=True)
+  
     def has_role(self, role_name):
         return any(role.name == role_name for role in self.roles)
 
     def __repr__(self):
         return f"<User {self.name}>"
 
-class FERPARequest(db.Model):
-    __tablename__ = 'ferpa_requests'
+# Request Type
+class RequestType(enum.Enum):
+    FERPA = 'ferpa'
+    INFO = 'info'
+    MEDICAL = 'medical'
+    DROP = 'drop'
 
-    id = db.Column(db.Integer, primary_key=True)
-    
-    # Meta data
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    status = db.Column(db.String(10), nullable=False)
-    time = db.Column(db.DateTime, server_default=db.func.now())
-    pdf_link = db.Column(db.String(100), nullable=False)
-    sig_link = db.Column(db.String(100))
-
-    # Name and campus
-    name = db.Column(db.String(25))
-    campus = db.Column(db.String(25))
-
-    # Officials
-    official_choices = db.Column(db.String(100)) # comma-separated string
-    official_other = db.Column(db.String(100))
-
-    # Information
-    info_choices = db.Column(db.String(100)) # comma-separated string
-    info_other = db.Column(db.String(100))
-
-    # Release
-    release_choices = db.Column(db.String(100)) # comma-separated string
-    release_other = db.Column(db.String(100))
-
-    # Release and purpose
-    release_to = db.Column(db.String(50))
-    purpose = db.Column(db.String(25))
-    additional_names = db.Column(db.String(50))
-
-    # Essential info
-    password = db.Column(db.String(25), nullable=False)
-    peoplesoft_id = db.Column(db.String(25), nullable=False)
-    date = db.Column(db.Date(), nullable=False)
-
-    # Relationship to User model
-    user = db.relationship('User', back_populates='ferpa_requests')
-
-class InfoChangeRequest(db.Model):
-    __tablename__ = 'infochange_requests'
+class Request(db.Model):
+    __tablename__ = 'requests'
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -90,122 +54,14 @@ class InfoChangeRequest(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     status = db.Column(db.String(10), nullable=False)
     time = db.Column(db.DateTime, server_default=db.func.now())
+    request_type = db.Column(db.Enum(RequestType), nullable=False)
+
+    # Filenames
     pdf_link = db.Column(db.String(100), nullable=False)
     sig_link = db.Column(db.String(100))
     
-    # Name and ID
-    name = db.Column(db.String(25), nullable=False)
-    peoplesoft_id = db.Column(db.String(6), nullable=False)
+    # Form fields
+    form_data = db.Column(db.String(1000))
 
-    # Choice for Name/SSN
-    choice = db.Column(db.String(25), nullable=False)
-
-    # Section A: Name Change
-    fname_old = db.Column(db.String(25))
-    mname_old = db.Column(db.String(25))
-    lname_old = db.Column(db.String(25))
-    sfx_old = db.Column(db.String(25))
-
-    fname_new = db.Column(db.String(25))
-    mname_new = db.Column(db.String(25))
-    lname_new = db.Column(db.String(25))
-    sfx_new = db.Column(db.String(25))
-
-    # Reason for name change
-    nmchg_reason = db.Column(db.String(25))
-
-    # Section B: SSN Change
-    ssn_old = db.Column(db.String(11))
-    ssn_new = db.Column(db.String(11))
-
-    # Reason for SSN change
-    ssnchg_reason = db.Column(db.String(25))
-
-    # Signature/Date
-    date = db.Column(db.Date(), nullable=False)
-
-    # Relationship to User model
-    user = db.relationship('User', back_populates='infochange_requests')
-
-class MedicalWithdrawalRequest(db.Model):
-    __tablename__ = 'withdrawal_requests'
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    # Meta data
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    status = db.Column(db.String(10), nullable=False)
-    time = db.Column(db.DateTime, server_default=db.func.now())
-    pdf_link = db.Column(db.String(100), nullable=False)
-    sig_link = db.Column(db.String(100))
-    
-    # Name and ID
-    name = db.Column(db.String(25), nullable=False)
-    peoplesoft_id = db.Column(db.String(6), nullable=False)
-    college = db.Column(db.String(50), nullable=False)
-    degree = db.Column(db.String(50), nullable=False)
-    
-    # Address/Personal Info
-    city = db.Column(db.String(25), nullable=False)
-    state = db.Column(db.String(25), nullable=False)
-    zip_code = db.Column(db.String(25), nullable=False)
-    phone = db.Column(db.String(12), nullable=False)
-    email = db.Column(db.String(25), nullable=False)
-    
-    # Semester Info
-    term_year = db.Column(db.String(10), nullable=False)
-    last_attended = db.Column(db.Date(), nullable=False)
-
-    # Reason
-    reason = db.Column(db.String(25), nullable=False)
-    details = db.Column(db.String(100))
-
-    # Additional Information
-    financial_assistance = db.Column(db.String(3))
-    uh_health_insurance = db.Column(db.String(3))
-    campus_housing = db.Column(db.String(3))
-    visa_status = db.Column(db.String(3))
-    gi_bill_benefits = db.Column(db.String(3))
-
-    # Course to be Withdrawn
-    subject = db.Column(db.String(25), nullable=False)
-    number = db.Column(db.String(4), nullable=False)
-    section = db.Column(db.String(10), nullable=False)
-
-    # Date and Initial
-    date = db.Column(db.Date(), nullable=False)
-    initial = db.Column(db.String(5), nullable=False)
-
-    # Relationship to User model
-    user = db.relationship('User', back_populates='withdrawal_requests')
-
-class StudentDropRequest(db.Model):
-    __tablename__ = 'drop_requests'
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    # Meta data
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    status = db.Column(db.String(10), nullable=False)
-    time = db.Column(db.DateTime, server_default=db.func.now())
-    pdf_link = db.Column(db.String(100), nullable=False)
-    sig_link = db.Column(db.String(100))
-    
-    # Name and ID
-    name = db.Column(db.String(25), nullable=False)
-    peoplesoft_id = db.Column(db.String(6), nullable=False)
-    
-    # Semester Info
-    term_year = db.Column(db.String(10), nullable=False)
-
-    # Course to be Withdrawn
-    subject = db.Column(db.String(25), nullable=False)
-    number = db.Column(db.String(4), nullable=False)
-    section = db.Column(db.String(10), nullable=False)
-
-    # Date and Initial
-    date = db.Column(db.Date(), nullable=False)
-    birthdate = db.Column(db.Date(), nullable=False)
-
-    # Relationship to User model
-    user = db.relationship('User', back_populates='drop_requests')
+    # Relationship to user
+    user = db.relationship('User', back_populates='requests')
