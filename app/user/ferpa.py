@@ -229,7 +229,7 @@ def edit_ferpa_request(ferpa_request_id):
             info_choices = form.info_choices.data
             release_choices = form.release_choices.data
 
-            data = {
+            new_data = {
                  "NAME": form.name.data, "CAMPUS": form.campus.data,
 
                  "OPT_REGISTRAR": return_choice(official_choices, 'registrar'),
@@ -267,17 +267,15 @@ def edit_ferpa_request(ferpa_request_id):
             }
 
             # Generate PDF and store path
-            pdf_link = generate_ferpa(data)
+            pdf_link = generate_ferpa(new_data)
 
-            if form.is_draft.data:
-                status = "draft"
-            else:
-                status = "pending"
+            if form.is_draft.data: status = "draft"
+            else: status = "pending"
             
             # Update attributes of request
             ferpa_request.status = status
             ferpa_request.pdf_link = pdf_link
-            ferpa_request.form_data = data
+            ferpa_request.form_data = new_data
 
             # Commit FERPA request to database
             db.session.commit()
@@ -285,7 +283,6 @@ def edit_ferpa_request(ferpa_request_id):
             return redirect(url_for('user.user_requests'))
     
     # Get current user and roles
-    user = User.query.filter_by(azure_id=session['user']['sub']).first()
     roles = [role.name for role in user.roles]
 
     return render_template('ferpa.html', form=form, logged_in=True, roles=roles)

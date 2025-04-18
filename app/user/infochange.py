@@ -1,6 +1,6 @@
 import os, uuid
 from flask import request, session, render_template, flash, redirect, url_for, current_app
-from app.models import User, InfoChangeRequest, db
+from app.models import User, Request, RequestType, db
 from app.auth.role_required import role_required
 from app.forms import InfoChangeForm
 from app.utils.request_utils import allowed_file, return_choice, generate_ssn_name
@@ -13,7 +13,7 @@ def info_change_request():
     # Name/SSN change form
     form = InfoChangeForm()
 
-    # Get current user
+    # Get current user from session
     user = User.query.filter_by(azure_id=session['user']['sub']).first()
 
     if not form.validate_on_submit():
@@ -43,7 +43,6 @@ def info_change_request():
             latex_path = filepath.replace("\\", "/")
 
             # Get user id from session
-            user = User.query.filter_by(azure_id=session['user']['sub']).first()
             user_id = user.id
             
             # Construct dictionary for the PDF
@@ -69,38 +68,27 @@ def info_change_request():
 
             # Pass dictionary to function
             pdf_link = generate_ssn_name(data)
+
+            if form.is_draft.data: status = "draft"
+            else: status = "pending"
             
             # Build information change request
-            new_info_request = InfoChangeRequest(
+            new_request = Request(
                 user_id=user_id,
-                status="pending",
+                status=status,
+                request_type=RequestType.INFO,
                 pdf_link=pdf_link,
-                name=data['NAME'],
-                peoplesoft_id=data['PEOPLESOFT'],
-                choice="blank",
-                fname_old=data['FN_OLD'],
-                mname_old=data['MN_OLD'],
-                lname_old=data['LN_OLD'],
-                sfx_old=data['SUF_OLD'],
-                fname_new=data['FN_NEW'],
-                mname_new=data['MN_NEW'],
-                lname_new=data['LN_NEW'],
-                sfx_new=data['SUF_NEW'],
-                nmchg_reason="blank",
-                ssn_old=data['SSN_OLD'],
-                ssn_new=data['SSN_NEW'],
-                ssnchg_reason="blank",
-                date=data['DATE']
+                sig_link=unique_filename,
+                form_data=data
             )
 
             # Commit infochange request to database
-            db.session.add(new_info_request)
+            db.session.add(new_request)
             db.session.commit()
             
             return redirect(url_for('user.user_requests'))
 
     # Get current user and roles
-    user = User.query.filter_by(azure_id=session['user']['sub']).first()
     roles = [role.name for role in user.roles]
 
     return render_template('info_change.html', form=form, logged_in=True, roles=roles)
@@ -114,10 +102,8 @@ def edit_infochange_request(infochange_request_id):
     if not session.get('logged_in', False):
         return redirect(url_for("auth.login"))
     
-    print('Logged in')
-    
     # Ensure the request exists
-    infochange_request = InfoChangeRequest.query.get_or_404(infochange_request_id)
+    infochange_request = Request.query.get_or_404(infochange_request_id)
     if not infochange_request:
         flash('FERPA request was not found.', 'error')
         return redirect(url_for("user.user_requests"))
@@ -132,39 +118,50 @@ def edit_infochange_request(infochange_request_id):
         flash('Information change request was rejected. No further modifications are allowed.')
         return redirect(url_for("user.user_requests"))
     
-    print('Request exists')
-    
     # Create form, populate with user data
     form = InfoChangeForm()
 
     # Populate non-choice fields from database
+    data = infochange_request.form_data
+
+    options = {'EDIT_NAME': 'name', 'EDIT_SSN': 'ssn'}
+    choices = [value for opt, value in options.items()
+               if data.get(opt) == "yes"]
+    
+    nmchg_options = {'OPT_MARITAL': 'marriage',
+                     'OPT_COURT': 'court',
+                     'OPT_ERROR_NAME': 'error'}
+    nmchg_choices = [value for opt, value in options.items()
+                     if data.get(opt) == "yes"]
+    
+    ssnchg_options = {'OPT_ERROR_SSN': 'error', 'OPT_ADD_SSN': 'addition'}
+    ssnchg_choices = [value for opt, value in ssnchg_options.items()
+                      if data.get(opt) == "yes"]
+
     if request.method == 'GET':
-        print('Getting variables')
-        form.name.data = infochange_request.name
-        form.peoplesoft_id.data = infochange_request.peoplesoft_id
+        form.name.data = data['NAME']
+        form.peoplesoft_id.data = data['PEOPLESOFT']
 
         form.choice.data = infochange_request.choice.split(',')
 
-        form.first_name_old.data = infochange_request.fname_old
-        form.middle_name_old.data = infochange_request.mname_old
-        form.last_name_old.data = infochange_request.lname_old
-        form.suffix_old.data = infochange_request.sfx_old
+        form.first_name_old.data = data['FN_OLD']
+        form.middle_name_old.data = data['MN_OLD']
+        form.last_name_old.data = data['LN_OLD']
+        form.suffix_old.data = data['SUF_OLD']
 
-        form.first_name_new.data = infochange_request.fname_new
-        form.middle_name_new.data = infochange_request.mname_new
-        form.last_name_new.data = infochange_request.lname_new
-        form.suffix_new.data = infochange_request.sfx_new
+        form.first_name_new.data = data['FN_NEW']
+        form.middle_name_new.data = data['MN_NEW']
+        form.last_name_new.data = data['LN_NEW']
+        form.suffix_new.data = data['SUF_NEW']
 
-        form.name_change_reason.data = infochange_request.nmchg_reason.split(',')
+        form.name_change_reason.data = nmchg_choices
 
-        form.ssn_old.data = infochange_request.ssn_old
-        form.ssn_new.data = infochange_request.ssn_new
+        form.ssn_old.data = data['SSN_OLD']
+        form.ssn_new.data = data['SSN_NEW']
 
-        form.ssn_change_reason.data = infochange_request.ssnchg_reason.split(',')
+        form.ssn_change_reason.data = ssnchg_choices
 
-        form.date.data = infochange_request.date
-
-        print('Successfully printed form variables')
+        form.date.data = data['DATE']
 
     if form.validate_on_submit():
         
@@ -194,7 +191,7 @@ def edit_infochange_request(infochange_request_id):
             name_change_reason = form.name_change_reason.data
             ssn_change_reason = form.ssn_change_reason.data
 
-            data = {
+            new_data = {
                 "NAME": form.name.data, 
                 "PEOPLESOFT": form.peoplesoft_id.data,
                 "EDIT_NAME": return_choice(choice, 'name'),
@@ -211,37 +208,15 @@ def edit_infochange_request(infochange_request_id):
                 "DATE": str(form.date.data)}
             
             # Generate PDF and store path
-            pdf_file = generate_ssn_name(data)
+            pdf_link = generate_ssn_name(new_data)
 
-            # Store choices as comma-separated strings
-            choice = ",".join(form.choice.data)
-            name_change_reason = ",".join(form.name_change_reason.data)
-            ssn_change_reason = ",".join(form.ssn_change_reason.data)
-
-            if form.is_draft.data:
-                status = "draft"
-            else:
-                status = "pending"
+            if form.is_draft.data: status = "draft"
+            else: status = "pending"
 
             # Update fields of request
             infochange_request.status = status
-            infochange_request.pdf_link = pdf_file
-            infochange_request.name = data['NAME']
-            infochange_request.peoplesoft_id = data['PEOPLESOFT']
-            infochange_request.choice = choice
-            infochange_request.fname_old = data['FN_OLD']
-            infochange_request.mname_old = data['MN_OLD']
-            infochange_request.lname_old = data['LN_OLD']
-            infochange_request.sfx_old = data['SUF_OLD']
-            infochange_request.fname_new = data['FN_NEW']
-            infochange_request.mname_new = data['MN_NEW']
-            infochange_request.lname_new = data['LN_NEW']
-            infochange_request.sfx_new = data['SUF_NEW']
-            infochange_request.nmchg_reason = name_change_reason
-            infochange_request.ssn_old = data['SSN_OLD']
-            infochange_request.ssn_new = data['SSN_NEW']
-            infochange_request.ssnchg_reason = ssn_change_reason
-            infochange_request.date = form.date.data
+            infochange_request.pdf_link = pdf_link
+            infochange_request.form_data = new_data
 
             db.session.commit()
 
