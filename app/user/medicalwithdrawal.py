@@ -1,4 +1,5 @@
 import os, uuid
+from datetime import datetime
 from flask import request, session, render_template, flash, redirect, url_for, current_app
 from app.models import User, Request, RequestType, db
 from app.auth.role_required import role_required
@@ -161,7 +162,7 @@ def edit_withdrawal_request(withdrawal_request_id):
         form.number.data = data['NUMBER']
         form.section.data = data['SECTION']
 
-        form.date.data = data['DATE']
+        form.date.data = form.date.data = datetime.strptime(data['DATE'], '%Y-%m-%d').date()
 
         form.initial.data = data['INITIAL']
 

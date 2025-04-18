@@ -1,4 +1,5 @@
 import os, uuid
+from datetime import datetime
 from flask import request, session, render_template, flash, redirect, url_for, current_app
 from app.models import User, Request, RequestType, db
 from app.auth.role_required import role_required
@@ -194,7 +195,7 @@ def edit_ferpa_request(ferpa_request_id):
 
         form.password.data = data['PASSWORD']
         form.peoplesoft_id.data = data['PEOPLESOFT']
-        form.date.data = data['DATE']
+        form.date.data = datetime.strptime(data['DATE'], '%Y-%m-%d').date()
 
     # Handle form submission
     if form.validate_on_submit():

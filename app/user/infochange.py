@@ -1,4 +1,5 @@
 import os, uuid
+from datetime import datetime
 from flask import request, session, render_template, flash, redirect, url_for, current_app
 from app.models import User, Request, RequestType, db
 from app.auth.role_required import role_required
@@ -161,7 +162,7 @@ def edit_infochange_request(infochange_request_id):
 
         form.ssn_change_reason.data = ssnchg_choices
 
-        form.date.data = data['DATE']
+        form.date.data = form.date.data = datetime.strptime(data['DATE'], '%Y-%m-%d').date()
 
     if form.validate_on_submit():
         
