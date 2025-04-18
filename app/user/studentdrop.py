@@ -1,6 +1,6 @@
 import os, uuid
 from flask import request, session, render_template, flash, redirect, url_for, current_app
-from app.models import User, StudentDropRequest, db
+from app.models import User, Request, RequestType, db
 from app.auth.role_required import role_required
 from app.forms import StudentDropForm
 from app.user import user_bp
@@ -42,10 +42,6 @@ def student_drop_request():
 
             latex_path = filepath.replace("\\", "/")
 
-            # Get user id from session
-            user = User.query.filter_by(azure_id=session['user']['sub']).first()
-            user_id = user.id
-
             # Create dictionary to pass to function
             data = {
                 "NAME": form.name.data,
@@ -62,26 +58,18 @@ def student_drop_request():
             pdf_link = generate_drop(data)
 
             # Pending or draft?
-            if form.is_draft.data:
-                status = "draft"
+            if form.is_draft.data: status = "draft"
             else: status = "pending"
 
-            new_drop_request = StudentDropRequest(
-                user_id=user_id,
+            new_request = Request(
+                user_id=user.id,
                 status=status,
+                request_type=RequestType.DROP,
                 pdf_link=pdf_link,
                 sig_link=unique_filename,
-                name=data['NAME'],
-                peoplesoft_id=data['PEOPLESOFT'],
-                birthdate=data['BIRTHDATE'],
-                term_year=data['TERMYEAR'],
-                subject=data['SUBJECT'],
-                number=data['NUMBER'],
-                section=data['SECTION'],
-                date=data['DATE']
             )
 
-            db.session.add(new_drop_request)
+            db.session.add(new_request)
             db.session.commit()
 
             return redirect(url_for('user.user_requests'))
@@ -100,7 +88,7 @@ def edit_drop_request(drop_request_id):
         return redirect(url_for("auth.login"))
     
     # Ensure the request exists
-    drop_request = StudentDropRequest.query.get_or_404(drop_request_id)
+    drop_request = Request.query.get_or_404(drop_request_id)
     if not drop_request:
         flash('Student drop request was not found.', 'error')
         return redirect(url_for("user.user_requests"))
@@ -117,19 +105,17 @@ def edit_drop_request(drop_request_id):
     
     # Create form, populate with user data
     form = StudentDropForm()
+    data = drop_request.form_data
 
     # Populate form data from database
     if request.method == 'GET':
-        form.name.data = drop_request.name
-        form.peoplesoft_id.data = drop_request.peoplesoft_id
-
-        form.term_year.data = drop_request.term_year
-
-        form.subject.data = drop_request.subject
-        form.number.data = drop_request.number
-        form.section.data = drop_request.section
-
-        form.date.data = drop_request.date
+        form.name.data = data['NAME']
+        form.peoplesoft_id.data = data['PEOPLESOFT']
+        form.term_year.data = data['TERMYEAR']
+        form.subject.data = data['SUBJECT']
+        form.number.data = data['NUMBER']
+        form.section.data = data['SECTION']
+        form.date.data = data['DATE']
 
     if form.validate_on_submit():
         # Ensure the user uploaded a signature
@@ -159,7 +145,7 @@ def edit_drop_request(drop_request_id):
             user_id = user.id
 
             # Create dictionary to pass to function
-            data = {
+            new_data = {
                 "NAME": form.name.data,
                 "PEOPLESOFT": form.peoplesoft_id.data,
                 "TERMYEAR": form.term_year.data,
@@ -170,23 +156,16 @@ def edit_drop_request(drop_request_id):
                 "DATE": str(form.date.data)
             }
 
-            pdf_link = generate_drop(data)
+            pdf_link = generate_drop(new_data)
 
             # Pending or draft?
-            if form.is_draft.data:
-                status = "draft"
+            if form.is_draft.data: status = "draft"
             else: status = "pending"
 
             # Update attribute values of request
             drop_request.status = status
             drop_request.pdf_link = pdf_link
-            drop_request.name = data['NAME']
-            drop_request.peoplesoft_id = data['PEOPLESOFT']
-            drop_request.term_year = data['TERMYEAR']
-            drop_request.subject = data['SUBJECT']
-            drop_request.number = data['NUMBER']
-            drop_request.section = data['SECTION']
-            drop_request.date = form.date.data
+            drop_request.form_data = new_data
 
             db.session.commit()
 
