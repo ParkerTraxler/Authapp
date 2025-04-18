@@ -1,13 +1,13 @@
 from flask import session, redirect, url_for, flash
 from app.manager import manager_bp
-from app.models import InfoChangeRequest, User, db
+from app.models import Request, User, db
 from app.auth.role_required import role_required
 
 # Approve info change request
-@manager_bp.route('/requests/infochange-approve/<int:id>', methods=['POST'])
+@manager_bp.route('/requests/approve/<int:id>', methods=['POST'])
 @role_required('manager')
-def approve_infochange_request(id):
-    req = InfoChangeRequest.query.get_or_404(id)
+def approve_request(id):
+    req = Request.query.get_or_404(id)
     req.status = 'approved'
     
     db.session.commit()
@@ -16,10 +16,10 @@ def approve_infochange_request(id):
     return redirect(url_for('manager.manage_requests'))
 
 # Return info change request
-@manager_bp.route('/requests/infochange-return/<int:id>', methods=['POST'])
+@manager_bp.route('/requests/return/<int:id>', methods=['POST'])
 @role_required('manager')
-def return_infochange_request(id):
-    req = InfoChangeRequest.query.get_or_404(id)
+def return_request(id):
+    req = Request.query.get_or_404(id)
     req.status = 'returned'
     
     db.session.commit()
@@ -28,10 +28,10 @@ def return_infochange_request(id):
     return redirect(url_for('manager.manage_requests'))
 
 # Reject an info change request
-@manager_bp.route('/requests/infochange-reject/<int:id>', methods=['POST'])
+@manager_bp.route('/requests/reject/<int:id>', methods=['POST'])
 @role_required('manager')
-def reject_infochange_request(id):
-    req = InfoChangeRequest.query.get_or_404(id)
+def reject_request(id):
+    req = Request.query.get_or_404(id)
     req.status = 'rejected'
     
     db.session.commit()
