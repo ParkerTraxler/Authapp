@@ -126,6 +126,7 @@ class MedicalWithdrawalForm(FlaskForm):
     degree = StringField('Degree', validators=[DataRequired(), Length(max=25)])
 
     # Address/Personal Info
+    address = StringField('Address', validators=[DataRequired(), Length(max=25)])
     city = StringField('City', validators=[DataRequired(), Length(max=25)])
     state = StringField('State', validators=[DataRequired(), Length(max=25)])
     zip_code = StringField('Zip Code', validators=[DataRequired(), Length(max=25)])
@@ -160,7 +161,6 @@ class MedicalWithdrawalForm(FlaskForm):
     is_draft = BooleanField('Save as Draft?')
 
     submit = SubmitField('Submit SSN/Name Change')
-
 
 class StudentDropForm(FlaskForm):
     # Name/ID/College

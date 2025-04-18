@@ -40,9 +40,6 @@ def ferpa_request():
 
             latex_path = filepath.replace("\\", "/")
 
-            # Get user id from session
-            user_id = user.id
-
             # Construct a dictionary for the PDF
             official_choices = form.official_choices.data
             info_choices = form.info_choices.data
@@ -93,7 +90,7 @@ def ferpa_request():
             
             # Create new FERPA request
             new_request = Request(
-                user_id=user_id,
+                user_id=user.id,
                 status=status,
                 request_type=RequestType.FERPA,
                 pdf_link=pdf_file,
@@ -269,6 +266,7 @@ def edit_ferpa_request(ferpa_request_id):
             # Generate PDF and store path
             pdf_link = generate_ferpa(new_data)
 
+            # Pending or draft?
             if form.is_draft.data: status = "draft"
             else: status = "pending"
             
@@ -283,6 +281,7 @@ def edit_ferpa_request(ferpa_request_id):
             return redirect(url_for('user.user_requests'))
     
     # Get current user and roles
+    user = User.query.filter_by(azure_id=session['user']['sub']).first()
     roles = [role.name for role in user.roles]
 
     return render_template('ferpa.html', form=form, logged_in=True, roles=roles)

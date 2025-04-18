@@ -61,7 +61,7 @@ class Request(db.Model):
     sig_link = db.Column(db.String(100))
     
     # Form fields
-    form_data = db.Column(db.String(1000))
+    form_data = db.Column(db.JSON)
 
     # Relationship to user
     user = db.relationship('User', back_populates='requests')
