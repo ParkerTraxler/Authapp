@@ -3,50 +3,76 @@
 
 {% block content %}
 
-<h1 class="mb-3">Request Management</h1>
+<!-- Page Header -->
+<div class="mb-4">
+  <h2 class="fw-semibold fs-3">Request Management</h2>
+  <p class="text-muted mb-0">Submit and manage your academic request forms</p>
+</div>
 
+<!-- New Request Dropdown -->
+<div class="mb-4">
+  	<h5 class="fw-semibold mb-2">Start a New Request</h5>
+  	<div class="dropdown">
+    	<button class="btn btn-outline-primary dropdown-toggle px-4 py-2 mt-2 shadow-sm rounded-pill" type="button" id="requestDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+      		<i class="bi bi-journal-text me-2"></i> Select a Request Form
+    	</button>
+    	<ul class="dropdown-menu shadow rounded-3 border-0" aria-labelledby="requestDropdown">
+      		<li>
+        		<a class="dropdown-item d-flex align-items-center py-2" href="ferpa">
+          		<i class="bi bi-shield-lock-fill me-2 text-primary"></i> FERPA Form
+			</a>
+      		</li>
+      		<li>
+        		<a class="dropdown-item d-flex align-items-center py-2" href="info_change">
+          			<i class="bi bi-person-badge-fill me-2 text-success"></i> Name/SSN Change Form
+        		</a>
+      		</li>
+			<li>
+				<a class="dropdown-item d-flex align-items-center py-2" href="medical_withdrawal">
+					<i class="bi bi-emoji-frown-fill me-2 text-danger"></i> Medical Withdrawal Request
+				</a>
+			</li>
+			<li>
+				<a class="dropdown-item d-flex align-items-center py-2" href="student_drop">
+					<i class="bi bi-person-dash-fill me-2 text-warning"></i> Student Drop Request
+				</a>
+			</li>
+    	</ul>
+  	</div>
+</div>
 
-<!-- Drop down menu for new requests -->
-<div class="dropdown mb-3">
-	<button class="btn btn-primary dropdown-toggle" type="button" id="requestDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-	  Select a Request Form
-	</button>
-	<ul class="dropdown-menu" aria-labelledby="requestDropdown">
-	  <li><a class="dropdown-item" href="ferpa">FERPA Form</a></li>
-	  <li><a class="dropdown-item" href="info_change">Name/SSN Change Form</a></li>
-	  <li><a class="dropdown-item" href="medical_withdrawal">Medical Withdrawal Request</a></li>
-	  <li><a class="dropdown-item" href="student_drop">Student Drop Request</a></li>
-	</ul>
-  </div>
-
-<!-- Manage pre-existing requests -->
-<h2 class="mb-3">Requests</h2>
-<table class="table">
-	<thead>
-		<tr>
-			<th>Status</th>
-			<th>Type</th>
-			<th>Time Requested</th>
-			<th>File</th>
-			<th>Revise</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for request in requests %}
-		<tr>
-			<td><span class="{% if request.status == 'approved' %} text-success
-								{% elif request.status == 'pending' %} text-warning
-								{% elif request.status == 'draft' %} text-info
-								{% elif request.status == 'rejected' %} text-danger
-								{% elif request.status == 'returned' %} text-secondary {% endif %}">
-			{{ request.status.capitalize() }}</span></td>
-			<td>{{ request.request_type.value.capitalize() }}</td>
-			<td>{{ request.time }}</td>
-			<td><a href="{{ url_for('main.download_file', filename=request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
-			<td><a href="{{ url_for('user.edit_request', request_id=request.id) }}" class="btn btn-outline-primary btn-sm">Edit</a></td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
+<!-- Existing Requests Table -->
+<div>
+  	<h5 class="fw-semibold mb-3">Your Requests</h5>
+  	<div class="table-responsive shadow-sm rounded">
+    	<table class="table table-bordered align-middle mb-0">
+      		<thead class="table-light">
+        		<tr>
+					<th>Status</th>
+					<th>Type</th>
+					<th>Time Requested</th>
+					<th>File</th>
+					<th>Revise</th>
+        		</tr>
+      		</thead>
+      		<tbody>
+        		{% for request in requests %}
+        			<tr>
+						<td><span class="{% if request.status == 'approved' %} text-success
+							{% elif request.status == 'pending' %} text-warning
+							{% elif request.status == 'draft' %} text-info
+							{% elif request.status == 'rejected' %} text-danger
+							{% elif request.status == 'returned' %} text-secondary {% endif %}">
+            				{{ request.status.capitalize() }}</span></td>
+          				<td>{{ request.request_type.value.capitalize() }}</td>
+          				<td>{{ request.time }}</td>
+          				<td><a href="{{ url_for('main.download_file', filename=request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a></td>
+          				<td><a href="{{ url_for('user.edit_request', request_id=request.id) }}" class="btn btn-outline-primary btn-sm">Edit</a></td>
+        			</tr>
+        		{% endfor %}
+      		</tbody>
+    	</table>
+  	</div>
+</div>
 
 {% endblock %}
