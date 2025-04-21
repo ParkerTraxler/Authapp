@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from app.utils.db_utils import create_default_roles
+from app.utils.db_utils import create_default_roles, create_organizational_units
 from app.utils.file_utils import create_upload_folders
 from .models import db
 from .config import Config
@@ -34,6 +34,7 @@ def create_app(config=Config):
     with app.app_context():
         db.create_all()
         create_default_roles()
+        create_organizational_units()
 
     # Create upload folders for forms/signatures
     create_upload_folders(app.config['FORM_FOLDER'], app.config['UPLOAD_FOLDER'])

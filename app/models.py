@@ -3,6 +3,21 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+class OrganizationalUnit(db.Model):
+    __tablename__ = 'organizational_units'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+
+    parent_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'))
+    parent = db.relationship('OrganizationalUnit', remote_side=[id], backref='sub_units')
+
+    manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    manager = db.relationship('User', foreign_keys=[manager_id], backref='manages_unit')
+
+    def __repr__(self):
+        return f"<OrgUnit {self.name}"
+
 # Association table for users and roles
 user_roles = db.Table('user_roles',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
@@ -30,8 +45,12 @@ class User(db.Model):
     roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
     active = db.Column(db.Boolean(), default=True)
 
+    # Organizational unit info
+    unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'))
+    unit = db.relationship('OrganizationalUnit', foreign_keys=[unit_id], backref='users')
+
     requests = db.relationship('Request', back_populates='user', lazy=True)
-  
+
     def has_role(self, role_name):
         return any(role.name == role_name for role in self.roles)
 
