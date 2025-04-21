@@ -1,7 +1,7 @@
 from flask import redirect, render_template, url_for, session, flash, request, current_app
 from . import auth_bp
 from app.msal_config import get_msal_app
-from app.models import User, db
+from app.models import User, Role, db
 
 # User login
 @auth_bp.route('/login')
@@ -40,11 +40,15 @@ def get_token():
 
                 return redirect(url_for("main.home"))
             else:
+                # Every new user gets user role
+                user_role = Role.query.filter_by(name="user").first()
+
                 # Create new user
                 user = User(
                     azure_id=user_claims['sub'],
                     name=user_claims.get('name'),
-                    email=user_claims.get('preferred_username')
+                    email=user_claims.get('preferred_username'),
+                    roles=[user_role]
                 )
 
                 # Commit new user to database
