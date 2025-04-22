@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Delegate Request{% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow-sm rounded-3 border-0">
+        <div class="card-header bg-light text-dark">
+            <h4 class="mb-0">Delegate Request</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label for="employee" class="form-label">Select Employee</label>
+                    {{ form.employee(class="form-select") }}
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-outline-dark">
+                        {{ form.submit.label.text }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

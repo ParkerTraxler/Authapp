@@ -1,17 +1,13 @@
 {% extends 'base.html' %}
-{% block title %}Academic Requests{% endblock %}
+{% block title %}Delegated Requests{% endblock %}
 
 {% block content %}
-
-<!-- Page Header -->
 <div class="mb-4">
-  <h2 class="fw-semibold fs-3">Request Management</h2>
-  <p class="text-muted mb-0">Review and process academic request forms submitted by students</p>
+  <h2 class="fw-semibold fs-3">Delegated Requests</h2>
+  <p class="text-muted mb-0">Approve, return, or reject delegated requests</p>
 </div>
 
-<!-- Assigned (Non-Delegated) Requests -->
-<div class="mb-5">
-  <h5 class="fw-semibold mb-3">Assigned to You</h5>
+<div>
   <div class="table-responsive shadow-sm rounded">
     <table class="table table-bordered align-middle mb-0">
       <thead class="table-light">
@@ -29,9 +25,9 @@
           <td>
             <span class="{% if request.status == 'approved' %} text-success
                         {% elif request.status == 'pending' %} text-warning
-                        {% elif request.status == 'draft' %} text-info
+                        {% elif request.status == 'returned' %} text-secondary
                         {% elif request.status == 'rejected' %} text-danger
-                        {% elif request.status == 'returned' %} text-secondary {% endif %}">
+                        {% endif %}">
               {{ request.status.capitalize() }}
             </span>
           </td>
@@ -52,7 +48,6 @@
               <form action="{{ url_for('manager.reject_request', id=request.id) }}" method="post">
                 <button type="submit" class="btn btn-danger btn-sm">Reject</button>
               </form>
-              <a href="{{ url_for('manager.delegate_request', id=request.id) }}" class="btn btn-secondary btn-sm">Delegate</a>
             </div>
             {% else %}
             <span class="text-muted">No actions available.</span>
@@ -64,44 +59,4 @@
     </table>
   </div>
 </div>
-
-<!-- Delegated Requests -->
-<div class="mb-5">
-  <h5 class="fw-semibold mb-3">Delegated Requests</h5>
-  <div class="table-responsive shadow-sm rounded">
-    <table class="table table-bordered align-middle mb-0">
-      <thead class="table-light">
-        <tr>
-          <th>Status</th>
-          <th>Type</th>
-          <th>Time</th>
-          <th>File</th>
-          <th>Delegated To</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for request in delegated_requests %}
-        <tr>
-          <td>
-            <span class="{% if request.status == 'approved' %} text-success
-                        {% elif request.status == 'pending' %} text-warning
-                        {% elif request.status == 'draft' %} text-info
-                        {% elif request.status == 'rejected' %} text-danger
-                        {% elif request.status == 'returned' %} text-secondary {% endif %}">
-              {{ request.status.capitalize() }}
-            </span>
-          </td>
-          <td>{{ request.request_type.value.capitalize() }}</td>
-          <td>{{ request.time }}</td>
-          <td>
-            <a href="{{ url_for('main.download_file', filename=request.pdf_link) }}" class="btn btn-outline-primary btn-sm">File</a>
-          </td>
-          <td>{{ request.delegated_to.name }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
 {% endblock %}

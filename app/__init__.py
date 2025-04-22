@@ -23,12 +23,14 @@ def create_app(config=Config):
     from app.user import user_bp
     from app.admin import admin_bp
     from app.manager import manager_bp
+    from app.employee import employee_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(manager_bp, url_prefix='/manager')
+    app.register_blueprint(employee_bp, url_prefix='/employee')
 
     # Create tables and default roles
     with app.app_context():

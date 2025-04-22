@@ -31,6 +31,9 @@
 						{% if 'manager' in roles %}
 							<li class="nav-item"><a class="nav-link" href="{{ url_for('manager.manage_requests') }}">Manage Requests</a></li>
 						{% endif %}
+						{% if 'employee' in roles %}
+							<li class="nav-item"><a class="nav-link" href="{{ url_for('employee.delegated_requests') }}">Your Requests</a></li>
+						{% endif %}
 					
 					{% else %}
 						<li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>

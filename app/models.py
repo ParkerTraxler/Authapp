@@ -83,12 +83,18 @@ class Request(db.Model):
     current_unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'), nullable=True)
     current_unit = db.relationship('OrganizationalUnit', foreign_keys=[current_unit_id])
 
+    # Delegation data
+    delegated_to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    delegated_to = db.relationship('User', foreign_keys=[delegated_to_id])
+
     # Filenames
     pdf_link = db.Column(db.String(100), nullable=False)
     sig_link = db.Column(db.String(100))
     
     # Form fields
     form_data = db.Column(db.JSON)
+
+    modified_at = db.Column(db.DateTime, nullable=True)
 
     # Relationship to user
     user = db.relationship('User', foreign_keys=[user_id], back_populates='requests')

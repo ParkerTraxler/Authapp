@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Header -->
+  <div class="mb-4">
+    <h2 class="fw-semibold">Approval Reports</h2>
+    <p class="text-muted mb-0">Overview of request statuses within your organizational unit</p>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm p-3 border-start border-primary border-4">
+        <h6 class="text-muted">Total Requests</h6>
+        <h3 class="fw-bold text-primary">{{ unit_requests|length }}</h3>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm p-3 border-start border-warning border-4">
+        <h6 class="text-muted">Pending</h6>
+        <h3 class="fw-bold text-warning">{{ pending_requests|length }}</h3>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm p-3 border-start border-success border-4">
+        <h6 class="text-muted">Approved</h6>
+        <h3 class="fw-bold text-success">{{ approved_requests|length }}</h3>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm p-3 border-start border-danger border-4">
+        <h6 class="text-muted">Rejected</h6>
+        <h3 class="fw-bold text-danger">{{ rejected_requests|length }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Tables -->
+  <div class="mb-5">
+    <h4 class="mb-3">Pending Approvals</h4>
+    {% if pending_requests %}
+      <div class="table-responsive rounded shadow-sm">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Submitted By</th>
+              <th>Submitted At</th>
+              <th>Current Approver</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for req in pending_requests %}
+            <tr>
+              <td>{{ req.id }}</td>
+              <td>{{ req.request_type.value.capitalize() }}</td>
+              <td>{{ req.user.name }}</td>
+              <td>{{ req.time.strftime('%Y-%m-%d') }}</td>
+              <td>{{ req.current_approver.name if req.current_approver else '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted">No pending requests at this time.</p>
+    {% endif %}
+  </div>
+
+  <div class="mb-5">
+    <h4 class="mb-3">Approved Requests</h4>
+    {% if approved_requests %}
+      <div class="table-responsive rounded shadow-sm">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Submitted By</th>
+              <th>Approved At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for req in approved_requests %}
+            <tr>
+              <td>{{ req.id }}</td>
+              <td>{{ req.request_type.value.capitalize() }}</td>
+              <td>{{ req.user.name }}</td>
+              <td>{{ req.modified_at.strftime('%Y-%m-%d') if req.updated_at else '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted">No approved requests available.</p>
+    {% endif %}
+  </div>
+
+  <div class="mb-5">
+    <h4 class="mb-3">Rejected Requests</h4>
+    {% if rejected_requests %}
+      <div class="table-responsive rounded shadow-sm">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Submitted By</th>
+              <th>Rejected At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for req in rejected_requests %}
+            <tr>
+              <td>{{ req.id }}</td>
+              <td>{{ req.request_type.value.capitalize() }}</td>
+              <td>{{ req.user.name }}</td>
+              <td>{{ req.modified_at.strftime('%Y-%m-%d') if req.updated_at else '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted">No rejected requests available.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

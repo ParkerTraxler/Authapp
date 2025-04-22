@@ -1,6 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import DateField, StringField, SubmitField, BooleanField, SelectMultipleField, FileField
+from wtforms import DateField, StringField, SubmitField, BooleanField, SelectMultipleField, FileField, SelectField
 from wtforms.validators import DataRequired, Email, Length, Regexp
+
+# Delegate Request Form
+class DelegateRequestForm(FlaskForm):
+    employee = SelectField('Delegate to Employee', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Delegate Request')
 
 # Profile Form
 class ProfileForm(FlaskForm):
