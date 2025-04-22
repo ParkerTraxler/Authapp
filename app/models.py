@@ -49,7 +49,8 @@ class User(db.Model):
     unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'))
     unit = db.relationship('OrganizationalUnit', foreign_keys=[unit_id], backref='users')
 
-    requests = db.relationship('Request', back_populates='user', lazy=True)
+    requests = db.relationship('Request', foreign_keys='Request.user_id', back_populates='user', lazy=True)
+
 
     def has_role(self, role_name):
         return any(role.name == role_name for role in self.roles)
@@ -90,4 +91,4 @@ class Request(db.Model):
     form_data = db.Column(db.JSON)
 
     # Relationship to user
-    user = db.relationship('User', back_populates='requests')
+    user = db.relationship('User', foreign_keys=[user_id], back_populates='requests')

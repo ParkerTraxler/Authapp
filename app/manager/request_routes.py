@@ -8,11 +8,23 @@ from app.auth.role_required import role_required
 @role_required('manager')
 def approve_request(id):
     req = Request.query.get_or_404(id)
-    req.status = 'approved'
+    manager = User.query.filter_by(azure_id=session['user']['sub']).first()
+
+    if req.current_approver_id != manager.id:
+        flash('You are not authorized to approve this request.', 'danger')
+        return redirect(url_for('manager.manage_requests'))
     
+    if req.current_unit and req.current_unit.parent:
+        parent_unit = req.current_unit.parent
+        req.current_unit_id = parent_unit.id
+        req.current_approver_id = parent_unit.manager_id
+        flash(f'The request has been forwarded to {parent_unit.name} for further approval.', 'info')
+    else:
+        req.status = 'approved'
+        req.curernt_approver_id = None
+        flash('The request has been approved successfully.', 'success')
+
     db.session.commit()
-    
-    flash('Request approved successfully.', 'success')
     return redirect(url_for('manager.manage_requests'))
 
 # Return info change request
@@ -33,7 +45,7 @@ def return_request(id):
 def reject_request(id):
     req = Request.query.get_or_404(id)
     req.status = 'rejected'
-    
+
     db.session.commit()
     
     flash('Request rejected successfully.', 'warning')
