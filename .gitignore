@@ -1,5 +1,6 @@
 __pycache__
 .env
 venv
+migrations
 app/uploads/signatures/*
 app/uploads/forms/*
