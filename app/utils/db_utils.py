@@ -5,7 +5,8 @@ def create_default_roles():
     roles = {
         'admin': 'Full administrative access',
         'user': 'Standard user access',
-        'manager': 'Academic manager access'
+        'manager': 'Academic manager access',
+        'employee': 'Employee access'
     }
 
     for role_name, description in roles.items():
