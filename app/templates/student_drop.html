@@ -1,72 +1,287 @@
 {% extends 'base.html' %}
-{% block title %}Student Drop{% endblock %}
+{% block title %}Student Drop Form{% endblock %}
 {% block content %}
-<h1 class="mb-3">Student Drop Form</h1>
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h1 class="mb-0">Student Drop Form</h1>
+    </div>
+    <div class="card-body">
+      <p class="lead mb-4">Use this form to request dropping courses. Please complete all required fields.</p>
+      
+      <form method="POST" enctype="multipart/form-data" id="studentDropForm">
+        {{ form.hidden_tag() }}
+        
+        <div class="alert alert-danger d-none" id="validationErrors">
+          <h5><i class="bi bi-exclamation-triangle"></i> Please correct the following errors:</h5>
+          <ul id="errorList"></ul>
+        </div>
+        
+        <div class="accordion mb-4" id="dropFormAccordion">
+          <!-- Student Information -->
+          <div class="accordion-item" data-section="1">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <i class="bi bi-person-fill me-2"></i> Student Information
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
+              <div class="accordion-body">
+                <div class="row g-3">
+                  <div class="col-md-8">
+                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    {{ form.name(class="form-control", placeholder="Enter your full legal name", required=True) }}
+                    <div class="invalid-feedback">Full name is required</div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="birthdate" class="form-label">Birthdate <span class="text-danger">*</span></label>
+                    {{ form.birthdate(class="form-control", type="date", required=True) }}
+                    <div class="invalid-feedback">Birthdate is required</div>
+                  </div>
+                </div>
+                
+                <div class="row g-3 mt-2">
+                  <div class="col-md-6">
+                    <label for="peoplesoft_id" class="form-label">UH ID <span class="text-danger">*</span></label>
+                    {{ form.peoplesoft_id(class="form-control", placeholder="Your 7-digit myUH ID number", required=True) }}
+                    <div class="invalid-feedback">myUH ID is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="term_year" class="form-label">Term and Year <span class="text-danger">*</span></label>
+                    {{ form.term_year(class="form-control form-select", required=True) }}
+                    <div class="invalid-feedback">Term and year is required</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Course Information -->
+          <div class="accordion-item" data-section="2">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                <i class="bi bi-book-fill me-2"></i> Course Information
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+              <div class="accordion-body">
+                <p class="text-muted mb-3">Please provide details for the course you wish to drop:</p>
+                
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Subject <span class="text-danger">*</span></th>
+                        <th>Course Number <span class="text-danger">*</span></th>
+                        <th>Section <span class="text-danger">*</span></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          {{ form.subject(class="form-control", placeholder="e.g., MATH", required=True) }}
+                          <div class="invalid-feedback">Subject is required</div>
+                        </td>
+                        <td>
+                          {{ form.number(class="form-control", placeholder="e.g., 1301", required=True) }}
+                          <div class="invalid-feedback">Course number is required</div>
+                        </td>
+                        <td>
+                          {{ form.section(class="form-control", placeholder="e.g., 12345", required=True) }}
+                          <div class="invalid-feedback">Section is required</div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+               
+            </div>
+          </div>
+          
+          <!-- Acknowledgement & Signature -->
+          <div class="accordion-item" data-section="3">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                <i class="bi bi-pen-fill me-2"></i> Signature & Submission
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree">
+              <div class="accordion-body">
+                <div class="card bg-light mb-4">
 
-<form method="POST" enctype="multipart/form-data">
-	{{ form.hidden_tag() }}
+                </div>
+                
+                <div class="mb-3">
+                  <label for="signature" class="form-label">Digital Signature <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    {{ form.signature(class="form-control", required=True) }}
+                    <span class="input-group-text"><i class="bi bi-upload"></i></span>
+                  </div>
+                  <div class="form-text">Upload an image of your signature (.jpg, .png, or .pdf)</div>
+                  <div class="invalid-feedback">Signature is required</div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+                  {{ form.date(class="form-control", type="date", required=True) }}
+                  <div class="invalid-feedback">Date is required</div>
+                </div>
+                
+                <div class="d-flex justify-content-end mt-4">
+                  <div class="me-auto">
+                    <div class="form-check">
+                      {{ form.is_draft(class="form-check-input") }}
+                      {{ form.is_draft.label(class="form-check-label") }}
+                      <div class="form-text">Check this box to save as draft and complete later</div>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary px-4 py-2" id="submitButton">
+                    <i class="bi bi-check2 me-1"></i> {{ form.submit.label }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
-	<!-- Name/Birthdate -->
-	<div class="mb-3">
-		<label for="name" class="form-label">Name</label>
-		{{ form.name(class="form-control") }}
-	</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize variables
+    const accordionItems = document.querySelectorAll('.accordion-item');
+    const validationErrorsContainer = document.getElementById('validationErrors');
+    const errorList = document.getElementById('errorList');
+    const form = document.getElementById('studentDropForm');
+    
+    // Validate a section
+    function validateSection(sectionIndex) {
+      const section = accordionItems[sectionIndex];
+      const requiredFields = section.querySelectorAll('[required]');
+      let isValid = true;
+      let errors = [];
+      
+      // Clear previous validation
+      section.querySelectorAll('.is-invalid').forEach(el => {
+        el.classList.remove('is-invalid');
+      });
+      
+      // Check all required fields
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          field.classList.add('is-invalid');
+          const label = field.closest('.mb-3, .col-md-4, .col-md-6, .col-md-8, td').querySelector('label')?.textContent.replace('*', '').trim() || 'Field';
+          errors.push(`${label} is required`);
+          isValid = false;
+        }
+      });
+      
+      return { isValid, errors };
+    }
+    
+    // Form submission validation
+    form.addEventListener('submit', function(event) {
+      const isDraft = document.querySelector('#is_draft').checked;
+      if (isDraft) {
+        return true;
+      }
+     
+      let allValid = true;
+      let allErrors = [];
+      let firstInvalidSection = null;
+  
+      for (let i = 0; i < accordionItems.length; i++) {
+        const result = validateSection(i);
+        if (!result.isValid) {
+          allValid = false;
+          allErrors = allErrors.concat(result.errors);
+          
+          if (firstInvalidSection === null) {
+            firstInvalidSection = i;
+          }
+        }
+      }
+      
+      if (!allValid) {
+        event.preventDefault();
 
-	<div class="mb-3">
-		<label for="name" class="form-label">Birthdate</label>
-		{{ form.birthdate(class="form-control") }}
-	</div>
+        validationErrorsContainer.classList.remove('d-none');
+        errorList.innerHTML = '';
+        allErrors.forEach(error => {
+          const li = document.createElement('li');
+          li.textContent = error;
+          errorList.appendChild(li);
+        });
+        
+        // Open the first section with errors
+        if (firstInvalidSection !== null) {
+          const invalidAccordion = accordionItems[firstInvalidSection].querySelector('.accordion-collapse');
+          const bsCollapse = bootstrap.Collapse.getInstance(invalidAccordion) || new bootstrap.Collapse(invalidAccordion, { toggle: false });
+          bsCollapse.show();
+        }
+        
+        window.scrollTo(0, validationErrorsContainer.offsetTop - 20);
+      } else {
+        validationErrorsContainer.classList.add('d-none');
+      }
+    });
+  });
+</script>
 
-	<!-- PeopleSoft ID -->
-	<div class="mb-3">
-		<label for="peoplesoft_id" class="form-label">myUH ID</label>
-		{{ form.peoplesoft_id(class="form-control") }}
-	</div>
+<style>
+  .accordion-button.section-complete {
+    background-color: #f8f9fa;
+  }
+  
+  #validationErrors {
+    margin-bottom: 20px;
+    border-left: 5px solid #dc3545;
+  }
+  
+  .accordion-button:not(.collapsed) {
+    background-color: #f8f9fa;
+    color: #212529;
+    box-shadow: none;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .form-label .text-danger {
+    font-weight: bold;
+  }
+  
+  #submitButton {
+    font-weight: 500;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  .card {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .card-header {
+    padding: 1rem 1.25rem;
+  }
 
-	<!-- Semester Info -->
-	<div class="mb-3">
-		<label for="term_year" class="form-label">Term and Year</label>
-		{{ form.term_year(class="form-control") }}
-	</div>
-
-
-	<!-- Course to be Withdrawn -->
-	<div class="mb-3">
-		<label for="subject" class="form-label">Subject</label>
-		{{ form.subject(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="number" class="form-label">Course Number</label>
-		{{ form.number(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="section" class="form-label">Section Number</label>
-		{{ form.section(class="form-control") }}
-	</div>
-
-	<h3 class="mb-3">Sign and Date</h3>
-	<!-- Signature (File Upload) -->
-	<div class="mb-3">
-		<label for="signature" class="form-label">Signature</label>
-		{{ form.signature(class="form-control") }}
-	</div>
-
-	<!-- Date -->
-	<div class="mb-3">
-		<label for="date" class="form-label">Date</label>
-		{{ form.date(class="form-control") }}
-	</div>
-
-	<!-- Is it a draft? -->
-	<div class="mb-3">
-		<label for="is_draft" class="form-label"></label>
-		{{ form.is_draft(class="form-check-input") }}
-        {{ form.is_draft.label(class="form-check-label") }}
-	</div>
-
-	<button type="submit" class="btn btn-primary mt-3 mb-3">{{ form.submit.label }}</button>
-
-</form>
+  .form-label {
+    font-weight: 500;
+  }
+  
+  .table-bordered {
+    border-color: #dee2e6;
+  }
+  
+  .table th {
+    background-color: #f8f9fa;
+    font-weight: 500;
+  }
+  
+  .bi {
+    vertical-align: -0.125em;
+  }
+</style>
 {% endblock %}

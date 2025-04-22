@@ -1,120 +1,461 @@
 {% extends 'base.html' %}
 {% block title %}Name/SSN Change{% endblock %}
 {% block content %}
-<h1 class="mb-3">Name/SSN Change Form</h1>
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h1 class="mb-0">Name/SSN Change Form</h1>
+    </div>
+    <div class="card-body">
+      <p class="lead mb-4">Use this form to request changes to your name or Social Security Number in the university records system.</p>
+      
+      <form method="POST" enctype="multipart/form-data" id="changeForm">
+        {{ form.hidden_tag() }}
+        
+        <!-- Error messages area -->
+        <div class="alert alert-danger d-none" id="validationErrors">
+          <h5><i class="bi bi-exclamation-triangle"></i> Please correct the following errors:</h5>
+          <ul id="errorList"></ul>
+        </div>
+        
+        <div class="accordion mb-4" id="changeFormAccordion">
+          <!-- Student Information -->
+          <div class="accordion-item" data-section="1">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <i class="bi bi-person-fill me-2"></i> Student Information
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#changeFormAccordion">
+              <div class="accordion-body">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    {{ form.name(class="form-control", placeholder="Enter your full current name", required=True) }}
+                    <div class="invalid-feedback">Full name is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="peoplesoft_id" class="form-label">myUH ID <span class="text-danger">*</span></label>
+                    {{ form.peoplesoft_id(class="form-control", placeholder="Your 7-digit myUH ID number", required=True) }}
+                    <div class="invalid-feedback">myUH ID is required</div>
+                  </div>
+                </div>
+                
+                <div class="mb-3 mt-3">
+                  <label for="choice" class="form-label">What would you like to update? <span class="text-danger">*</span></label>
+                  {{ form.choice(class="form-control form-select", required=True) }}
+                  <div class="invalid-feedback">Please select an option</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Name Change Section -->
+          <div class="accordion-item" data-section="2">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                <i class="bi bi-pencil-square me-2"></i> Name Change
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#changeFormAccordion">
+              <div class="accordion-body">
+                <h5 class="card-title mb-3">Current Name</h5>
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label for="first_name_old" class="form-label">First Name <span class="text-danger">*</span></label>
+                    {{ form.first_name_old(class="form-control", placeholder="Current first name") }}
+                    <div class="invalid-feedback">Current first name is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="middle_name_old" class="form-label">Middle Name</label>
+                    {{ form.middle_name_old(class="form-control", placeholder="Current middle name (if any)") }}
+                  </div>
+                  <div class="col-md-6">
+                    <label for="last_name_old" class="form-label">Last Name <span class="text-danger">*</span></label>
+                    {{ form.last_name_old(class="form-control", placeholder="Current last name") }}
+                    <div class="invalid-feedback">Current last name is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="suffix_old" class="form-label">Suffix</label>
+                    {{ form.suffix_old(class="form-control", placeholder="Jr., Sr., III, etc. (if any)") }}
+                  </div>
+                </div>
+                
+                <h5 class="card-title mb-3">New Name</h5>
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label for="first_name_new" class="form-label">First Name <span class="text-danger">*</span></label>
+                    {{ form.first_name_new(class="form-control", placeholder="New first name") }}
+                    <div class="invalid-feedback">New first name is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="middle_name_new" class="form-label">Middle Name</label>
+                    {{ form.middle_name_new(class="form-control", placeholder="New middle name (if any)") }}
+                  </div>
+                  <div class="col-md-6">
+                    <label for="last_name_new" class="form-label">Last Name <span class="text-danger">*</span></label>
+                    {{ form.last_name_new(class="form-control", placeholder="New last name") }}
+                    <div class="invalid-feedback">New last name is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="suffix_new" class="form-label">Suffix</label>
+                    {{ form.suffix_new(class="form-control", placeholder="Jr., Sr., III, etc. (if any)") }}
+                  </div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="name_change_reason" class="form-label">Reason for Name Change <span class="text-danger">*</span></label>
+                  {{ form.name_change_reason(class="form-control form-select") }}
+                  <div class="form-text">Select the reason that best explains your name change request.</div>
+                  <div class="invalid-feedback">Please select a reason for name change</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- SSN Change Section -->
+          <div class="accordion-item" data-section="3">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                <i class="bi bi-shield-lock me-2"></i> SSN Change
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#changeFormAccordion">
+              <div class="accordion-body">
+                <div class="alert alert-warning">
+                  <i class="bi bi-exclamation-triangle"></i> For security purposes, SSN changes require additional documentation. Be prepared to provide supporting documents.
+                </div>
+                
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label for="ssn_old" class="form-label">Previous SSN <span class="text-danger">*</span></label>
+                    {{ form.ssn_old(class="form-control", placeholder="XXX-XX-XXXX") }}
+                    <div class="invalid-feedback">Previous SSN is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="ssn_new" class="form-label">New SSN <span class="text-danger">*</span></label>
+                    {{ form.ssn_new(class="form-control", placeholder="XXX-XX-XXXX") }}
+                    <div class="invalid-feedback">New SSN is required</div>
+                  </div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="ssn_change_reason" class="form-label">Reason for SSN Change <span class="text-danger">*</span></label>
+                  {{ form.ssn_change_reason(class="form-control form-select") }}
+                  <div class="form-text">Select the reason that best explains your SSN change request.</div>
+                  <div class="invalid-feedback">Please select a reason for SSN change</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Signature Section -->
+          <div class="accordion-item" data-section="4">
+            <h2 class="accordion-header" id="headingFour">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                <i class="bi bi-pen-fill me-2"></i> Signature & Submission
+              </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#changeFormAccordion">
+              <div class="accordion-body">
+                <p class="text-muted mb-3">By signing below, I certify that the information provided is true and accurate.</p>
+                
+                <div class="mb-3">
+                  <label for="signature" class="form-label">Digital Signature <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    {{ form.signature(class="form-control", required=True) }}
+                    <span class="input-group-text"><i class="bi bi-upload"></i></span>
+                  </div>
+                  <div class="form-text">Upload an image of your signature (.jpg, .png, or .pdf)</div>
+                  <div class="invalid-feedback">Signature is required</div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+                  {{ form.date(class="form-control", type="date", required=True) }}
+                  <div class="invalid-feedback">Date is required</div>
+                </div>
+                
+                <div class="form-check mt-4">
+                  {{ form.is_draft(class="form-check-input") }}
+                  {{ form.is_draft.label(class="form-check-label") }}
+                  <div class="form-text">Check this box to save as draft and complete later</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between mt-4">
+          <button type="button" class="btn btn-outline-secondary" id="backButton">Back</button>
+          <button type="button" class="btn btn-outline-primary" id="nextButton">Next</button>
+        </div>
 
-<form method="POST" enctype="multipart/form-data">
-	{{ form.hidden_tag() }}
+        <div class="mt-4 border-top pt-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="form-check">
+              {{ form.is_draft(class="form-check-input") }}
+              {{ form.is_draft.label(class="form-check-label") }}
+              <div class="form-text">Check to save as draft and complete later</div>
+            </div>
+            <button type="submit" class="btn btn-success px-4 py-2" id="submitButton">{{ form.submit.label }}</button>
+          </div>
+        </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
 
-	<h3 class="mb-3">Name and PeopleSoft ID</h3>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize variables
+    const accordionItems = document.querySelectorAll('.accordion-item');
+    const backButton = document.getElementById('backButton');
+    const nextButton = document.getElementById('nextButton');
+    const submitButton = document.getElementById('submitButton');
+    const validationErrorsContainer = document.getElementById('validationErrors');
+    const errorList = document.getElementById('errorList');
+    const form = document.getElementById('changeForm');
+    let currentStep = 0;
 
-	<!-- Name -->
-	<div class="mb-3">
-		<label for="name" class="form-label">Name:</label>
-		{{ form.name(class="form-control") }}
-	</div>
+    submitButton.style.display = 'none';
+    backButton.style.display = 'none';
+    
+    // Validate current section
+    function validateSection(sectionIndex) {
+      const section = accordionItems[sectionIndex];
+      const requiredFields = section.querySelectorAll('[required]');
+      let isValid = true;
+      let errors = [];
+      
+      // Clear previous validation
+      section.querySelectorAll('.is-invalid').forEach(el => {
+        el.classList.remove('is-invalid');
+      });
+      
+      // Check all required fields
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          field.classList.add('is-invalid');
+          const label = field.closest('.mb-3, .col-md-6').querySelector('label').textContent.replace('*', '').trim();
+          errors.push(`${label} is required`);
+          isValid = false;
+        }
+      });
+      
+      // Display errors if any
+      if (!isValid) {
+        validationErrorsContainer.classList.remove('d-none');
+        errorList.innerHTML = '';
+        errors.forEach(error => {
+          const li = document.createElement('li');
+          li.textContent = error;
+          errorList.appendChild(li);
+        });
+      } else {
+        validationErrorsContainer.classList.add('d-none');
+      }
+      
+      return isValid;
+    }
+    
+    // Show current step
+    function showStep(stepIndex) {
+      // Hide all accordion items
+      accordionItems.forEach((item, index) => {
+        const collapseEl = item.querySelector('.accordion-collapse');
+        const bsCollapse = bootstrap.Collapse.getInstance(collapseEl);
+        
+        if (bsCollapse) {
+          bsCollapse.hide();
+        }
+      });
+      
+      // Show current accordion item
+      const currentAccordion = accordionItems[stepIndex].querySelector('.accordion-collapse');
+      const bsCollapse = bootstrap.Collapse.getInstance(currentAccordion) || new bootstrap.Collapse(currentAccordion, { toggle: false });
+      bsCollapse.show();
+      
+      // Update buttons
+      backButton.style.display = stepIndex === 0 ? 'none' : 'block';
+      if (stepIndex === accordionItems.length - 1) {
+        nextButton.style.display = 'none';
+        submitButton.style.display = 'block';
+      } else {
+        nextButton.style.display = 'block';
+        submitButton.style.display = 'none';
+      }
+    }
+    
+    // Event listeners for next/back buttons
+    nextButton.addEventListener('click', function() {
+      if (currentStep < accordionItems.length - 1) {
+        if (validateSection(currentStep)) {
+          currentStep++;
+          showStep(currentStep);
+          // Hide validation errors when moving to next section
+          validationErrorsContainer.classList.add('d-none');
+        } else {
+          // Validation failed, don't proceed
+          window.scrollTo(0, validationErrorsContainer.offsetTop - 20);
+        }
+      }
+    });
+    
+    backButton.addEventListener('click', function() {
+      if (currentStep > 0) {
+        currentStep--;
+        showStep(currentStep);
+        // Hide validation errors when going back
+        validationErrorsContainer.classList.add('d-none');
+      }
+    });
+    
+    // Form submission validation
+    form.addEventListener('submit', function(event) {
+      if (!validateSection(currentStep)) {
+        event.preventDefault();
+        window.scrollTo(0, validationErrorsContainer.offsetTop - 20);
+        return;
+      }
+      
+      // Check if the form is being saved as draft
+      const isDraft = document.querySelector('#is_draft').checked;
+      if (isDraft) {
+        // If it's a draft, allow submission without validation
+        return true;
+      }
+      
+      // Validate all sections before final submission
+      let allValid = true;
+      for (let i = 0; i < accordionItems.length; i++) {
+        // Store current step
+        const tempStep = currentStep;
+        // Temporarily change step to validate
+        currentStep = i;
+        if (!validateSection(i)) {
+          allValid = false;
+        }
+        // Restore current step
+        currentStep = tempStep;
+      }
+      
+      if (!allValid) {
+        event.preventDefault();
+        alert('Please fill in all required fields before submitting.');
+        // Reset to first invalid section
+        for (let i = 0; i < accordionItems.length; i++) {
+          currentStep = i;
+          if (!validateSection(i)) {
+            showStep(i);
+            break;
+          }
+        }
+        window.scrollTo(0, validationErrorsContainer.offsetTop - 20);
+      }
+    });
+    
+    // Show/hide specific sections based on the choice
+    const choiceSelect = document.querySelector('#choice');
+    if (choiceSelect) {
+      choiceSelect.addEventListener('change', function() {
+        const nameChangeSection = document.querySelector('[data-section="2"]').querySelector('.accordion-collapse');
+        const ssnChangeSection = document.querySelector('[data-section="3"]').querySelector('.accordion-collapse');
+        const nameChangeBsCollapse = bootstrap.Collapse.getInstance(nameChangeSection) || new bootstrap.Collapse(nameChangeSection, { toggle: false });
+        const ssnChangeBsCollapse = bootstrap.Collapse.getInstance(ssnChangeSection) || new bootstrap.Collapse(ssnChangeSection, { toggle: false });
+        
+        // Hide both sections first
+        nameChangeBsCollapse.hide();
+        ssnChangeBsCollapse.hide();
+        
+        // Show relevant section based on choice
+        if (this.value === 'name') {
+          nameChangeBsCollapse.show();
+        } else if (this.value === 'ssn') {
+          ssnChangeBsCollapse.show();
+        } else if (this.value === 'both') {
+          nameChangeBsCollapse.show();
+          ssnChangeBsCollapse.show();
+        }
+      });
+    }
+    
+    // Initialize form
+    showStep(currentStep);
+    
+    // Add visual indication of which sections are complete
+    function updateSectionStatus() {
+      accordionItems.forEach((item, index) => {
+        if (index < currentStep) {
+          // Section is complete
+          const button = item.querySelector('.accordion-button');
+          if (!button.classList.contains('section-complete')) {
+            button.classList.add('section-complete');
+            // Add a check mark
+            const checkMark = document.createElement('span');
+            checkMark.className = 'bi bi-check-circle-fill text-success ms-2';
+            button.appendChild(checkMark);
+          }
+        }
+      });
+    }
+    
+    // Update section status when navigating
+    nextButton.addEventListener('click', updateSectionStatus);
+  });
+</script>
 
-	<!-- PeopleSoft ID -->
-	<div class="mb-3">
-		<label for="peoplesoft_id" class="form-label">myUH ID:</label>
-		{{ form.peoplesoft_id(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="choice" class="form-label">Update Name or SSN?</label>
-		{{ form.choice(class="form-control") }}
-	</div>
-	<!-- SECTION A: NAME CHANGE -->
-	<h3 class="mb-3">Section A: Name Change</h3>
-	<!-- Old name info -->
-	<h4 class="mb-3">Current Name</h4>
-	<div class="mb-3">
-		<label for="first_name_old" class="form-label">Current First Name:</label>
-		{{ form.first_name_old(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="middle_name_old" class="form-label">Current Middle Name:</label>
-		{{ form.middle_name_old(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="last_name_old" class="form-label">Current Last Name:</label>
-		{{ form.last_name_old(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="suffix_old" class="form-label">Current Suffix:</label>
-		{{ form.suffix_old(class="form-control") }}
-	</div>
-
-	<!-- New name info -->
-	<h4 class="mb-3">New Name</h4>
-	<div class="mb-3">
-		<label for="first_name_new" class="form-label">New First Name:</label>
-		{{ form.first_name_new(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="middle_name_new" class="form-label">New Middle Name:</label>
-		{{ form.middle_name_new(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="last_name_new" class="form-label">New Last Name:</label>
-		{{ form.last_name_new(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="suffix_new" class="form-label">New Suffix:</label>
-		{{ form.suffix_new(class="form-control") }}
-	</div>
-
-	<!-- Name change reason checkbox -->
-	<div class="mb-3">
-		<label for="name_change_reason" class="form-label">Reason for Name Change:</label>
-		{{ form.name_change_reason(class="form-control") }}
-	</div>
-
-
-	<!-- SECTION B: SSN CHANGE -->
-	<h3 class="mb-3">Section B: SSN Change</h3>
-	<div class="mb-3">
-		<label for="ssn_old" class="form-label">Old SSN:</label>
-		{{ form.ssn_old(class="form-control", placeholder="123-45-678") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="ssn_new" class="form-label">New SSN:</label>
-		{{ form.ssn_new(class="form-control", placeholder="123-45-678") }}
-	</div>
-
-	<!-- SSN change reason checkbox -->
-	<div class="mb-3">
-		<label for="ssn_change_reason" class="form-label">Reason for SSN Change</label>
-		{{ form.ssn_change_reason(class="form-control") }}
-	</div>
-
-	<h3 class="mb-3">Sign and Date</h3>
-	<!-- Signature (File Upload) -->
-	<div class="mb-3">
-		<label for="peoplesoft_id" class="form-label">Signature Upload</label>
-		{{ form.signature(class="form-control") }}
-	</div>
-
-	<!-- Date -->
-	<div class="mb-3">
-		<label for="date" class="form-label">Date:</label>
-		{{ form.date(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="is_draft" class="form-label"></label>
-		{{ form.is_draft(class="form-check-input") }}
-        {{ form.is_draft.label(class="form-check-label") }}
-	</div>
-
-	<button type="submit" class="btn btn-primary mt-3 mb-3">{{ form.submit.label }}</button>
-
-</form>
+<style>
+  /* Custom styles */
+  .accordion-button.section-complete {
+    background-color: #f8f9fa;
+  }
+  
+  /* Make the validation errors more prominent */
+  #validationErrors {
+    margin-bottom: 20px;
+    border-left: 5px solid #dc3545;
+  }
+  
+  /* Improve form section appearance */
+  .accordion-button:not(.collapsed) {
+    background-color: #f8f9fa;
+    color: #212529;
+    box-shadow: none;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  /* Style for required fields */
+  .form-label .text-danger {
+    font-weight: bold;
+  }
+  
+  /* Make the submit button more obvious */
+  #submitButton {
+    font-weight: 500;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  /* Card styling */
+  .card {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .card-header {
+    padding: 1rem 1.25rem;
+  }
+  
+  /* Form field spacing */
+  .form-label {
+    font-weight: 500;
+  }
+  
+  /* Icons styling */
+  .bi {
+    vertical-align: -0.125em;
+  }
+</style>
 {% endblock %}

@@ -1,158 +1,418 @@
 {% extends 'base.html' %}
 {% block title %}Medical Withdrawal{% endblock %}
 {% block content %}
-<h1 class="mb-3">Medical Withdrawal Form</h1>
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h1 class="mb-0">Medical Withdrawal Form</h1>
+    </div>
+    <div class="card-body">
+      <p class="lead mb-4">Use this form to request a medical withdrawal from courses due to health-related circumstances.</p>
+      
+      <form method="POST" enctype="multipart/form-data" id="medicalWithdrawalForm">
+        {{ form.hidden_tag() }}
+        
+        <div class="alert alert-danger d-none" id="validationErrors">
+          <h5><i class="bi bi-exclamation-triangle"></i> Please correct the following errors:</h5>
+          <ul id="errorList"></ul>
+        </div>
+        
+        <div class="accordion mb-4" id="medicalFormAccordion">
+          <!-- Student Information -->
+          <div class="accordion-item" data-section="1">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <i class="bi bi-person-fill me-2"></i> Student Information
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
+              <div class="accordion-body">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    {{ form.name(class="form-control", placeholder="Enter your full legal name", required=True) }}
+                    <div class="invalid-feedback">Full name is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="peoplesoft_id" class="form-label">UH ID <span class="text-danger">*</span></label>
+                    {{ form.peoplesoft_id(class="form-control", placeholder="Your 7-digit myUH ID number", required=True) }}
+                    <div class="invalid-feedback">myUH ID is required</div>
+                  </div>
+                </div>
+                
+                <div class="row g-3 mt-2">
+                  <div class="col-md-6">
+                    <label for="college" class="form-label">College <span class="text-danger">*</span></label>
+                    {{ form.college(class="form-control form-select", required=True) }}
+                    <div class="invalid-feedback">College is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="degree" class="form-label">Degree <span class="text-danger">*</span></label>
+                    {{ form.degree(class="form-control form-select", required=True) }}
+                    <div class="invalid-feedback">Degree is required</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contact Information -->
+          <div class="accordion-item" data-section="2">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                <i class="bi bi-envelope-fill me-2"></i> Contact Information
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+              <div class="accordion-body">
+                <div class="mb-3">
+                  <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
+                  {{ form.address(class="form-control", placeholder="Street address", required=True) }}
+                  <div class="invalid-feedback">Address is required</div>
+                </div>
+                
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="city" class="form-label">City <span class="text-danger">*</span></label>
+                    {{ form.city(class="form-control", placeholder="City", required=True) }}
+                    <div class="invalid-feedback">City is required</div>
+                  </div>
+                  <div class="col-md-3">
+                    <label for="state" class="form-label">State <span class="text-danger">*</span></label>
+                    {{ form.state(class="form-control form-select", required=True) }}
+                    <div class="invalid-feedback">State is required</div>
+                  </div>
+                  <div class="col-md-3">
+                    <label for="zip_code" class="form-label">Zip Code <span class="text-danger">*</span></label>
+                    {{ form.zip_code(class="form-control", placeholder="Zip code", required=True) }}
+                    <div class="invalid-feedback">Zip code is required</div>
+                  </div>
+                </div>
+                
+                <div class="row g-3 mt-2">
+                  <div class="col-md-6">
+                    <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                    {{ form.phone(class="form-control", placeholder="(XXX) XXX-XXXX", required=True) }}
+                    <div class="invalid-feedback">Phone number is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                    {{ form.email(class="form-control", placeholder="your.email@example.com", required=True) }}
+                    <div class="invalid-feedback">Email address is required</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Withdrawal Information -->
+          <div class="accordion-item" data-section="3">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                <i class="bi bi-calendar-event me-2"></i> Withdrawal Information
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree">
+              <div class="accordion-body">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="term_year" class="form-label">Term and Year <span class="text-danger">*</span></label>
+                    {{ form.term_year(class="form-control form-select", required=True) }}
+                    <div class="invalid-feedback">Term and year is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="last_attended" class="form-label">Date of Last Attendance <span class="text-danger">*</span></label>
+                    {{ form.last_attended(class="form-control", type="date", required=True) }}
+                    <div class="invalid-feedback">Last attendance date is required</div>
+                  </div>
+                </div>
+                
+                <div class="mb-3 mt-3">
+                  <label for="reason" class="form-label">Reason for Withdrawal <span class="text-danger">*</span></label>
+                  {{ form.reason(class="form-control form-select", required=True) }}
+                  <div class="form-text">Select the reason that best describes your situation</div>
+                  <div class="invalid-feedback">Reason is required</div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="details" class="form-label">Additional Details <span class="text-danger">*</span></label>
+                  {{ form.details(class="form-control", placeholder="Additional details about your medical situation", rows="4", required=True) }}
+                  <div class="form-text">Additional Details</div>
+                  <div class="invalid-feedback">Additional details are required</div>
+                </div>
+                
+                <div class="card bg-light mt-4 mb-3">
+                  <div class="card-body">
+                    <h5 class="card-title">Status Information</h5>
+                    <p class="card-text text-muted">Please check all that apply to you:</p>
+                    
+                    <div class="mb-2 form-check">
+                      {{ form.financial_assistance(class="form-check-input") }}
+                      {{ form.financial_assistance.label(class="form-check-label") }}
+                    </div>
+                    
+                    <div class="mb-2 form-check">
+                      {{ form.uh_health_insurance(class="form-check-input") }}
+                      {{ form.uh_health_insurance.label(class="form-check-label") }}
+                    </div>
+                    
+                    <div class="mb-2 form-check">
+                      {{ form.campus_housing(class="form-check-input") }}
+                      {{ form.campus_housing.label(class="form-check-label") }}
+                    </div>
+                    
+                    <div class="mb-2 form-check">
+                      {{ form.visa_status(class="form-check-input") }}
+                      {{ form.visa_status.label(class="form-check-label") }}
+                    </div>
+                    
+                    <div class="mb-2 form-check">
+                      {{ form.gi_bill_benefits(class="form-check-input") }}
+                      {{ form.gi_bill_benefits.label(class="form-check-label") }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Course Information -->
+          <div class="accordion-item" data-section="4">
+            <h2 class="accordion-header" id="headingFour">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                <i class="bi bi-book-fill me-2"></i> Course Information
+              </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour">
+              <div class="accordion-body">
+                <p class="text-muted mb-3">Please list all courses you wish to withdraw from:</p>
+                
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Subject</th>
+                        <th>Course Number</th>
+                        <th>Section</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          {{ form.subject(class="form-control", placeholder="e.g., MATH", required=True) }}
+                          <div class="invalid-feedback">Subject is required</div>
+                        </td>
+                        <td>
+                          {{ form.number(class="form-control", placeholder="e.g., 1301", required=True) }}
+                          <div class="invalid-feedback">Course number is required</div>
+                        </td>
+                        <td>
+                          {{ form.section(class="form-control", placeholder="e.g., 12345", required=True) }}
+                          <div class="invalid-feedback">Section is required</div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+               
+              </div>
+            </div>
+          </div>
+          
+          <!-- Acknowledgement & Signature -->
+          <div class="accordion-item" data-section="5">
+            <h2 class="accordion-header" id="headingFive">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                <i class="bi bi-pen-fill me-2"></i> Acknowledgement & Signature
+              </button>
+            </h2>
+            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive">
+              <div class="accordion-body">
+               
+                
+                <div class="mb-3">
+                  <label for="initial" class="form-label">Initial Here <span class="text-danger">*</span></label>
+                  {{ form.initial(class="form-control", placeholder="Type your initials to acknowledge", required=True) }}
+                  <div class="form-text">Type your initials to acknowledge that you have read and understand the information above</div>
+                  <div class="invalid-feedback">Initials are required</div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="signature" class="form-label">Digital Signature <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    {{ form.signature(class="form-control", required=True) }}
+                    <span class="input-group-text"><i class="bi bi-upload"></i></span>
+                  </div>
+                  <div class="form-text">Upload an image of your signature (.jpg, .png, or .pdf)</div>
+                  <div class="invalid-feedback">Signature is required</div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+                  {{ form.date(class="form-control", type="date", required=True) }}
+                  <div class="invalid-feedback">Date is required</div>
+                </div>
+                
+                <div class="d-flex justify-content-end mt-4">
+                  <div class="me-auto">
+                    <div class="form-check">
+                      {{ form.is_draft(class="form-check-input") }}
+                      {{ form.is_draft.label(class="form-check-label") }}
+                      <div class="form-text">Check this box to save as draft and complete later</div>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-success px-4 py-2" id="submitButton">
+                    <i class="bi bi-check2 me-1"></i> {{ form.submit.label }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </form>
+      
+     
+    </div>
+  </div>
+</div>
 
-<form method="POST" enctype="multipart/form-data">
-	{{ form.hidden_tag() }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize variables
+    const accordionItems = document.querySelectorAll('.accordion-item');
+    const validationErrorsContainer = document.getElementById('validationErrors');
+    const errorList = document.getElementById('errorList');
+    const form = document.getElementById('medicalWithdrawalForm');
+    
+    // Validate a section
+    function validateSection(sectionIndex) {
+      const section = accordionItems[sectionIndex];
+      const requiredFields = section.querySelectorAll('[required]');
+      let isValid = true;
+      let errors = [];
+      
+      // Clear previous validation
+      section.querySelectorAll('.is-invalid').forEach(el => {
+        el.classList.remove('is-invalid');
+      });
+      
+      // Check all required fields
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          field.classList.add('is-invalid');
+          const label = field.closest('.mb-3, .col-md-6, td').querySelector('label')?.textContent.replace('*', '').trim() || 'Field';
+          errors.push(`${label} is required`);
+          isValid = false;
+        }
+      });
+      
+      return { isValid, errors };
+    }
+    
+    // Form submission validation
+    form.addEventListener('submit', function(event) {
+      const isDraft = document.querySelector('#is_draft').checked;
+      if (isDraft) {
+        return true;
+      }
+     
+      let allValid = true;
+      let allErrors = [];
+      let firstInvalidSection = null;
+  
+      for (let i = 0; i < accordionItems.length; i++) {
+        const result = validateSection(i);
+        if (!result.isValid) {
+          allValid = false;
+          allErrors = allErrors.concat(result.errors);
+          
+          if (firstInvalidSection === null) {
+            firstInvalidSection = i;
+          }
+        }
+      }
+      
+      if (!allValid) {
+        event.preventDefault();
 
-	<!-- Name -->
-	<div class="mb-3">
-		<label for="name" class="form-label">Name</label>
-		{{ form.name(class="form-control") }}
-	</div>
+        validationErrorsContainer.classList.remove('d-none');
+        errorList.innerHTML = '';
+        allErrors.forEach(error => {
+          const li = document.createElement('li');
+          li.textContent = error;
+          errorList.appendChild(li);
+        });
+        
+        // Open the first section with errors
+        if (firstInvalidSection !== null) {
+          const invalidAccordion = accordionItems[firstInvalidSection].querySelector('.accordion-collapse');
+          const bsCollapse = bootstrap.Collapse.getInstance(invalidAccordion) || new bootstrap.Collapse(invalidAccordion, { toggle: false });
+          bsCollapse.show();
+        }
+        
+        window.scrollTo(0, validationErrorsContainer.offsetTop - 20);
+      } else {
+        validationErrorsContainer.classList.add('d-none');
+      }
+    });
+  });
+</script>
 
-	<!-- PeopleSoft ID -->
-	<div class="mb-3">
-		<label for="peoplesoft_id" class="form-label">myUH ID</label>
-		{{ form.peoplesoft_id(class="form-control") }}
-	</div>
+<style>
+  .accordion-button.section-complete {
+    background-color: #f8f9fa;
+  }
+  
+  #validationErrors {
+    margin-bottom: 20px;
+    border-left: 5px solid #dc3545;
+  }
+  
+  .accordion-button:not(.collapsed) {
+    background-color: #f8f9fa;
+    color: #212529;
+    box-shadow: none;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .form-label .text-danger {
+    font-weight: bold;
+  }
+  
+  #submitButton {
+    font-weight: 500;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  .card {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .card-header {
+    padding: 1rem 1.25rem;
+  }
 
-	<!-- College -->
-	<div class="mb-3">
-		<label for="college" class="form-label">College</label>
-		{{ form.college(class="form-control") }}
-	</div>
+  .form-label {
+    font-weight: 500;
+  }
+  
 
-	<!-- Degree -->
-	<div class="mb-3">
-		<label for="degree" class="form-label">Degree</label>
-		{{ form.degree(class="form-control") }}
-	</div>
+  .table-bordered {
+    border-color: #dee2e6;
+  }
+  
+  .table th {
+    background-color: #f8f9fa;
+    font-weight: 500;
+  }
+  
 
-	<!-- City, State, Zip -->
-	<div class="mb-3">
-		<label for="city" class="form-label">Address</label>
-		{{ form.address(class="form-control") }}
-	</div>
-	
-	<div class="mb-3">
-		<label for="city" class="form-label">City</label>
-		{{ form.city(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="state" class="form-label">State</label>
-		{{ form.state(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="zip_code" class="form-label">Zip</label>
-		{{ form.zip_code(class="form-control") }}
-	</div>
-
-	<!-- Phone, Email -->
-	<div class="mb-3">
-		<label for="phone" class="form-label">Phone</label>
-		{{ form.phone(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="email" class="form-label">Email</label>
-		{{ form.email(class="form-control") }}
-	</div>
-
-	<!-- Semester Info -->
-	<div class="mb-3">
-		<label for="term_year" class="form-label">Term and Year</label>
-		{{ form.term_year(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="last_attended" class="form-label">Date of Last Attendance</label>
-		{{ form.last_attended(class="form-control") }}
-	</div>
-
-	<!-- Reason -->
-	<div class="mb-3">
-		<label for="reason" class="form-label">Reason for Withdrawal</label>
-		{{ form.reason(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="details" class="form-label">Additional Details</label>
-		{{ form.details(class="form-control") }}
-	</div>
-
-	<!-- Additional Info -->
-	<div class="mb-3">
-		{{ form.financial_assistance(class="form-check-input") }}
-        {{ form.financial_assistance.label(class="form-check-label") }}
-	</div>
-
-	<div class="mb-3">
-		{{ form.uh_health_insurance(class="form-check-input") }}
-        {{ form.uh_health_insurance.label(class="form-check-label") }}
-	</div>
-
-	<div class="mb-3">
-		{{ form.campus_housing(class="form-check-input") }}
-        {{ form.campus_housing.label(class="form-check-label") }}
-	</div>
-
-	<div class="mb-3">
-		{{ form.visa_status(class="form-check-input") }}
-        {{ form.visa_status.label(class="form-check-label") }}
-	</div>
-
-	<div class="mb-3">
-		{{ form.gi_bill_benefits(class="form-check-input") }}
-        {{ form.gi_bill_benefits.label(class="form-check-label") }}
-	</div>
-
-	<!-- Courses to be Withdrawn -->
-	<div class="mb-3">
-		<label for="subject" class="form-label">Subject</label>
-		{{ form.subject(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="number" class="form-label">Course Number</label>
-		{{ form.number(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="section" class="form-label">Section Number</label>
-		{{ form.section(class="form-control") }}
-	</div>
-
-	<h3 class="mb-3">Sign and Date</h3>
-	<!-- Signature (File Upload) -->
-	<div class="mb-3">
-		<label for="signature" class="form-label">Signature</label>
-		{{ form.signature(class="form-control") }}
-	</div>
-
-	<!-- Date -->
-	<div class="mb-3">
-		<label for="date" class="form-label">Date</label>
-		{{ form.date(class="form-control") }}
-	</div>
-
-	<!-- Initial -->
-	<div class="mb-3">
-		<label for="date" class="form-label">Initial</label>
-		{{ form.initial(class="form-control") }}
-	</div>
-
-	<!-- Is it a draft? -->
-	<div class="mb-3">
-		<label for="is_draft" class="form-label"></label>
-		{{ form.is_draft(class="form-check-input") }}
-        {{ form.is_draft.label(class="form-check-label") }}
-	</div>
-
-	<button type="submit" class="btn btn-primary mt-3 mb-3">{{ form.submit.label }}</button>
-
-</form>
+  .bi {
+    vertical-align: -0.125em;
+  }
+</style>
 {% endblock %}

@@ -1,115 +1,481 @@
 {% extends 'base.html' %}
-{% block title %}FERPA Form{% endblock %}
+{% block title %}FERPA Release Form{% endblock %}
 {% block content %}
-<h1 class="mb-3">FERPA Release Form</h1>
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h1 class="mb-0">FERPA Release Form</h1>
+    </div>
+    <div class="card-body">
+      <p class="lead mb-4">This form authorizes the University to release your educational records to third parties as specified below.</p>
+      
+      <form method="POST" enctype="multipart/form-data" id="ferpaForm">
+        {{ form.hidden_tag() }}
+      
+        
+        <!-- Error messages area -->
+        <div class="alert alert-danger d-none" id="validationErrors">
+          <h5><i class="bi bi-exclamation-triangle"></i> Please correct the following errors:</h5>
+          <ul id="errorList"></ul>
+        </div>
+        
+        <div class="accordion mb-4" id="ferpaFormAccordion">
+          <!-- Student Information -->
+          <div class="accordion-item" data-section="1">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <i class="bi bi-person-fill me-2"></i> Student Information
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#ferpaFormAccordion">
+              <div class="accordion-body">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    {{ form.name(class="form-control", placeholder="Enter your full legal name", required=True) }}
+                    <div class="invalid-feedback">Full name is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="campus" class="form-label">Campus <span class="text-danger">*</span></label>
+                    {{ form.campus(class="form-control form-select", required=True) }}
+                    <div class="invalid-feedback">Please select a campus</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Information Officials -->
+          <div class="accordion-item" data-section="2">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                <i class="bi bi-person-badge me-2"></i> University Officials
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#ferpaFormAccordion">
+              <div class="accordion-body">
+                <p class="text-muted">Select university officials authorized to disclose your information:</p>
+                
+                <div class="mb-3">
+                  <label for="official_choices" class="form-label">Authorized Officials <span class="text-danger">*</span></label>
+                  {{ form.official_choices(class="form-control form-select", required=True) }}
+                  <div class="invalid-feedback">Please select at least one official</div>
+                </div>
+                
+                <div class="mb-3 other-field" id="officialOtherContainer">
+                  <label for="official_other" class="form-label">Others (if applicable)</label>
+                  {{ form.official_other(class="form-control", placeholder="Specify other authorized officials") }}
+                  <div class="form-text">Only complete if you selected "Other" above.</div>
+                  <div class="invalid-feedback">Please specify other officials</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section 3: Information Types -->
+          <div class="accordion-item" data-section="3">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                <i class="bi bi-file-earmark-text me-2"></i> Information Types
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#ferpaFormAccordion">
+              <div class="accordion-body">
+                <p class="text-muted">Select the types of information you authorize for disclosure:</p>
+                
+                <div class="mb-3">
+                  <label for="info_choices" class="form-label">Information Types <span class="text-danger">*</span></label>
+                  {{ form.info_choices(class="form-control", required=True) }}
+                  <div class="invalid-feedback">Please select at least one information type</div>
+                </div>
+                
+                <div class="mb-3 other-field" id="infoOtherContainer">
+                  <label for="info_other" class="form-label">Other Information (if applicable)</label>
+                  {{ form.info_other(class="form-control", placeholder="Specify other information types") }}
+                  <div class="form-text">Only complete if you selected "Other" above.</div>
+                  <div class="invalid-feedback">Please specify other information types</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section 4: Information Recipients -->
+          <div class="accordion-item" data-section="4">
+            <h2 class="accordion-header" id="headingFour">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                <i class="bi bi-people-fill me-2"></i> Information Recipients
+              </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#ferpaFormAccordion">
+              <div class="accordion-body">
+                <p class="text-muted">Specify who should receive your information:</p>
+                
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="release_to" class="form-label">Primary Recipient <span class="text-danger">*</span></label>
+                    {{ form.release_to(class="form-control", placeholder="Full name of primary recipient", required=True) }}
+                    <div class="invalid-feedback">Primary recipient is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="additional_names" class="form-label">Additional Recipients</label>
+                    {{ form.additional_names(class="form-control", placeholder="Names of additional recipients, if any") }}
+                  </div>
+                </div>
+                
+                <div class="mb-3 mt-3">
+                  <label for="purpose" class="form-label">Purpose of Release <span class="text-danger">*</span></label>
+                  {{ form.purpose(class="form-control", placeholder="Explain why you're releasing this information", required=True) }}
+                  <div class="invalid-feedback">Please explain the purpose of this release</div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="release_choices" class="form-label">Recipient Relationship <span class="text-danger">*</span></label>
+                  {{ form.release_choices(class="form-control form-select", required=True) }}
+                  <div class="invalid-feedback">Please select a relationship</div>
+                </div>
+                
+                <div class="mb-3 other-field" id="releaseOtherContainer">
+                  <label for="release_other" class="form-label">Other Relationship (if applicable)</label>
+                  {{ form.release_other(class="form-control", placeholder="Specify other relationship") }}
+                  <div class="form-text">Only complete if you selected "Other" above.</div>
+                  <div class="invalid-feedback">Please specify the relationship</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section 5: Authentication & Signature -->
+          <div class="accordion-item" data-section="5">
+            <h2 class="accordion-header" id="headingFive">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                <i class="bi bi-shield-lock me-2"></i> Authentication & Signature
+              </button>
+            </h2>
+            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#ferpaFormAccordion">
+              <div class="accordion-body">
+                <p class="text-muted">Verify your identity and sign the form:</p>
+                
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="peoplesoft_id" class="form-label">myUH ID <span class="text-danger">*</span></label>
+                    {{ form.peoplesoft_id(class="form-control", placeholder="Your 7-digit myUH ID number", required=True) }}
+                    <div class="invalid-feedback">myUH ID is required</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                    {{ form.password(class="form-control", placeholder="Password for verification", required=True) }}
+                    <div class="invalid-feedback">Password is required</div>
+                  </div>
+                </div>
+                
+                <div class="mb-3 mt-3">
+                  <label for="signature" class="form-label">Digital Signature <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    {{ form.signature(class="form-control", required=True) }}
+                    <span class="input-group-text"><i class="bi bi-upload"></i></span>
+                  </div>
+                  <div class="form-text">Upload an image of your signature (.jpg, .png, or .pdf)</div>
+                  <div class="invalid-feedback">Signature is required</div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+                  {{ form.date(class="form-control", type="date", required=True) }}
+                  <div class="invalid-feedback">Date is required</div>
+                </div>
+                
+                <div class="form-check mt-4">
+                  {{ form.is_draft(class="form-check-input") }}
+                  {{ form.is_draft.label(class="form-check-label") }}
+                  <div class="form-text">Check this box to save as draft and complete later</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between mt-4">
+          <button type="button" class="btn btn-outline-secondary" id="backButton">Back</button>
+          <button type="button" class="btn btn-outline-primary" id="nextButton">Next</button>
+          <button type="submit" class="btn btn-success" id="submitButton">{{ form.submit.label }}</button>
+        </div>
+      </form>
+      
+      <div class="alert alert-success mt-4">
+        <h5><i class="bi bi-info-circle"></i> About FERPA</h5>
+        <p class="mb-0">The Family Educational Rights and Privacy Act (FERPA) is a federal law that protects the privacy of student education records. By submitting this form, you are authorizing the University to release your protected information to the specified parties.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-<form method="POST" enctype="multipart/form-data">
-	{{ form.hidden_tag() }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize variables
+    const accordionItems = document.querySelectorAll('.accordion-item');
+    const progressBar = document.querySelector('.progress-bar');
+    const backButton = document.getElementById('backButton');
+    const nextButton = document.getElementById('nextButton');
+    const submitButton = document.getElementById('submitButton');
+    const validationErrorsContainer = document.getElementById('validationErrors');
+    const errorList = document.getElementById('errorList');
+    const form = document.getElementById('ferpaForm');
+    let currentStep = 0;
 
-	
-	<h2 class="mb-3">Name and Campus</h2>
-	<!-- Name -->
-	<div class="mb-3">
-		<label for="name" class="form-label">Name:</label>
-		{{ form.name(class="form-control") }}
-	</div>
+    submitButton.style.display = 'none';
+    backButton.style.display = 'none';
+    
 
-	<!-- Campus -->
-	<div class="mb-3">
-		<label for="campus" class="form-label">Campus:</label>
-		{{ form.campus(class="form-control") }}
-	</div>
+    
+    // Validate current section
+    function validateSection(sectionIndex) {
+      const section = accordionItems[sectionIndex];
+      const requiredFields = section.querySelectorAll('[required]');
+      let isValid = true;
+      let errors = [];
+      
+      // Clear previous validation
+      section.querySelectorAll('.is-invalid').forEach(el => {
+        el.classList.remove('is-invalid');
+      });
+      
+      // Check all required fields
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          field.classList.add('is-invalid');
+          const label = field.closest('.mb-3, .col-md-6').querySelector('label').textContent.replace('*', '').trim();
+          errors.push(`${label} is required`);
+          isValid = false;
+        }
+      });
+      
+      // Check "Other" fields if necessary
+      const otherContainers = section.querySelectorAll('.other-field');
+      otherContainers.forEach(container => {
+        const selectField = container.previousElementSibling.querySelector('select');
+        const otherField = container.querySelector('input, textarea');
+        
+        if (selectField && otherField) {
+          // Check if "Other" is selected in the dropdown
+          const isOtherSelected = Array.from(selectField.selectedOptions).some(option => 
+            option.text.toLowerCase().includes('other')
+          );
+          
+          if (isOtherSelected && !otherField.value.trim()) {
+            otherField.classList.add('is-invalid');
+            const label = container.querySelector('label').textContent.replace('(if applicable)', '').trim();
+            errors.push(`${label} is required when "Other" is selected`);
+            isValid = false;
+          }
+        }
+      });
+      
+      // Display errors if any
+      if (!isValid) {
+        validationErrorsContainer.classList.remove('d-none');
+        errorList.innerHTML = '';
+        errors.forEach(error => {
+          const li = document.createElement('li');
+          li.textContent = error;
+          errorList.appendChild(li);
+        });
+      } else {
+        validationErrorsContainer.classList.add('d-none');
+      }
+      
+      return isValid;
+    }
+    
+    // Show current step
+    function showStep(stepIndex) {
+      // Hide all accordion items
+      accordionItems.forEach((item, index) => {
+        const collapseEl = item.querySelector('.accordion-collapse');
+        const bsCollapse = bootstrap.Collapse.getInstance(collapseEl);
+        
+        if (bsCollapse) {
+          bsCollapse.hide();
+        }
+      });
+      
+      // Show current accordion item
+      const currentAccordion = accordionItems[stepIndex].querySelector('.accordion-collapse');
+      const bsCollapse = bootstrap.Collapse.getInstance(currentAccordion) || new bootstrap.Collapse(currentAccordion, { toggle: false });
+      bsCollapse.show();
+      
+      // Update buttons
+      backButton.style.display = stepIndex === 0 ? 'none' : 'block';
+      if (stepIndex === accordionItems.length - 1) {
+        nextButton.style.display = 'none';
+        submitButton.style.display = 'block';
+      } else {
+        nextButton.style.display = 'block';
+        submitButton.style.display = 'none';
+      }
+     
+    }
+    
+    // Event listeners for next/back buttons
+    nextButton.addEventListener('click', function() {
+      if (currentStep < accordionItems.length - 1) {
+        if (validateSection(currentStep)) {
+          currentStep++;
+          showStep(currentStep);
+          // Hide validation errors when moving to next section
+          validationErrorsContainer.classList.add('d-none');
+        } else {
+          // Validation failed, don't proceed
+          window.scrollTo(0, validationErrorsContainer.offsetTop - 20);
+        }
+      }
+    });
+    
+    backButton.addEventListener('click', function() {
+      if (currentStep > 0) {
+        currentStep--;
+        showStep(currentStep);
+        // Hide validation errors when going back
+        validationErrorsContainer.classList.add('d-none');
+      }
+    });
+    
+    // Form submission validation
+    form.addEventListener('submit', function(event) {
+      if (!validateSection(currentStep)) {
+        event.preventDefault();
+        window.scrollTo(0, validationErrorsContainer.offsetTop - 20);
+      }
+      
+      // Check if the form is being saved as draft
+      const isDraft = document.querySelector('#is_draft').checked;
+      if (isDraft) {
+        // If it's a draft, allow submission without validation
+        return true;
+      }
+      
+      // Validate all sections before final submission
+      let allValid = true;
+      for (let i = 0; i < accordionItems.length; i++) {
+        // Store current step
+        const tempStep = currentStep;
+        // Temporarily change step to validate
+        currentStep = i;
+        if (!validateSection(i)) {
+          allValid = false;
+        }
+        // Restore current step
+        currentStep = tempStep;
+      }
+      
+      if (!allValid) {
+        event.preventDefault();
+        alert('Please fill in all required fields before submitting.');
+        // Reset to first invalid section
+        for (let i = 0; i < accordionItems.length; i++) {
+          currentStep = i;
+          if (!validateSection(i)) {
+            showStep(i);
+            break;
+          }
+        }
+        window.scrollTo(0, validationErrorsContainer.offsetTop - 20);
+      }
+    });
+    
+    // Setup dependent "Other" fields
+    function setupOtherFields() {
+      const selects = document.querySelectorAll('select');
+      selects.forEach(select => {
+        select.addEventListener('change', function() {
+          const container = this.closest('.accordion-body');
+          const otherContainer = container.querySelector('.other-field');
+          if (otherContainer) {
+            const otherField = otherContainer.querySelector('input, textarea');
+            const isOtherSelected = Array.from(this.selectedOptions).some(option => 
+              option.text.toLowerCase().includes('other')
+            );
+            
+            if (isOtherSelected) {
+              otherContainer.classList.add('required-other');
+              if (otherField) {
+                otherField.setAttribute('required', true);
+              }
+            } else {
+              otherContainer.classList.remove('required-other');
+              if (otherField) {
+                otherField.removeAttribute('required');
+                otherField.classList.remove('is-invalid');
+              }
+            }
+          }
+        });
+        
+        // Trigger on load to set initial state
+        select.dispatchEvent(new Event('change'));
+      });
+    }
+    
+    // Initialize form
+    showStep(currentStep);
+    setupOtherFields();
+    
+    // Add visual indication of which sections are complete
+    function updateSectionStatus() {
+      accordionItems.forEach((item, index) => {
+        if (index < currentStep) {
+          // Section is complete
+          const button = item.querySelector('.accordion-button');
+          if (!button.classList.contains('section-complete')) {
+            button.classList.add('section-complete');
+            // Add a check mark
+            const checkMark = document.createElement('span');
+            checkMark.className = 'bi bi-check-circle-fill text-success ms-2';
+            button.appendChild(checkMark);
+          }
+        }
+      });
+    }
+    
+    // Update section status when navigating
+    nextButton.addEventListener('click', updateSectionStatus);
+  });
+</script>
 
-	<h2 class="mb-3">Officials</h2>
-	<h4 class="mb-3">Authorize officials to disclose information</h4>
-	<!-- Officials + Other field-->
-	<div class="mb-3">
-		<label for="official_choices" class="form-label">Choose:</label>
-		{{ form.official_choices(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="official_other" class="form-label">Other:</label>
-		<small>Only fill out this field if you selected other above.</small>
-		{{ form.official_other(class="form-control") }}
-	</div>
-
-	<h2 class="mb-3">Information</h2>
-	<h4 class="mb-3">Authorize type of information to disclose</h4>
-	<!-- Check boxes + other fields -->
-	<div class="mb-3">
-		<label for="info_choices" class="form-label">Choose:</label>
-		{{ form.info_choices(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="info_other" class="form-label">Other:</label>
-		<small>Only fill out this field if you selected other above.</small>
-		{{ form.info_other(class="form-control") }}
-	</div>
-
-	<h2 class="mb-3">Release</h2>
-	<h4 class="mb-3">Authorize individuals to receive your information</h4>
-	<!-- Release to -->
-	<div class="mb-3">
-		<label for="release_to" class="form-label">Release to:</label>
-		{{ form.release_to(class="form-control") }}
-	</div>
-
-	<!-- Purpose -->
-	<div class="mb-3">
-		<label for="purpose" class="form-label">Purpose:</label>
-		{{ form.purpose(class="form-control") }}
-	</div>
-
-	<!-- Additional names -->
-	<div class="mb-3">
-		<label for="additional_names" class="form-label">Additional Names:</label>
-		{{ form.additional_names(class="form-control") }}
-	</div>
-
-	<!-- Release to selection -->
-	<div class="mb-3">
-		<label for="release_choices" class="form-label">Choose:</label>
-		{{ form.release_choices(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="release_other" class="form-label">Other:</label>
-		<small>Only fill out this field if you selected other above.</small>
-		{{ form.release_other(class="form-control") }}
-	</div>
-
-
-	<h2 class="mb-3">Security & Signature</h2>
-	<!-- Essential Info -->
-	<div class="mb-3">
-		<label for="password" class="form-label">Password:</label>
-		{{ form.password(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="peoplesoft_id" class="form-label">myUH ID:</label>
-		{{ form.peoplesoft_id(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="peoplesoft_id" class="form-label">Signature Upload</label>
-		{{ form.signature(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="date" class="form-label">Date:</label>
-		{{ form.date(class="form-control") }}
-	</div>
-
-	<div class="mb-3">
-		<label for="is_draft" class="form-label"></label>
-		{{ form.is_draft(class="form-check-input") }}
-        {{ form.is_draft.label(class="form-check-label") }}
-	</div>
-
-	<button type="submit" class="btn btn-primary mt-3 mb-3">{{ form.submit.label }}</button>
-
-</form>
+<style>
+  /* Custom styles */
+  .accordion-button.section-complete {
+    background-color: #f8f9fa;
+  }
+  
+  .required-other {
+    border-left: 3px solid #ffc107;
+    padding-left: 10px;
+  }
+  
+  /* Make the validation errors more prominent */
+  #validationErrors {
+    margin-bottom: 20px;
+    border-left: 5px solid #dc3545;
+  }
+  
+  /* Improve form section appearance */
+  .accordion-button:not(.collapsed) {
+    background-color: #f8f9fa;
+    color: #212529;
+    box-shadow: none;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  /* Style for required fields */
+  .form-label .text-danger {
+    font-weight: bold;
+  }
+  
+  /* Make the submit button more obvious */
+  #submitButton {
+    font-weight: 500;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+</style>
 {% endblock %}

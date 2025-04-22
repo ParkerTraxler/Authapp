@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+}
+
+
+
+#sidebar {
+  width: 250px;
+  transform: translateX(0);
+  transition: all 0.5s ease-in-out; 
+  overflow: hidden;
+  margin-left: 0;
+}
+
+#layout{
+  min-height: 95vh;
+  display:flex;
+}
+#layout.sidebar-hidden #sidebar {
+  width: 0;
+  transform: translateX(-100%);
+  margin-left: -250px;
+  padding: 0;
+}
+
+#layout.sidebar-hidden #content {
+  width: 100%;
+}
+
+#content {
+  transition: width 0.5s ease-in-out;
+  width: calc(100% - 250px);
+  background-color: #f4f4f9; 
+}
+.nav-item{
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  margin-bottom: 2px;
+}
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1); 
+}
+
+.nav-item .nav-link {
+  display: block;
+  padding: 8px 15px;
+  color: rgba(233, 236, 239, .75) !important;
+}
+
+
+.nav-item:hover .nav-link {
+  color: white !important;
+}
+
+.bar-name{
+  margin-right: 10px;
+  margin-left: auto;
+  margin-top: 4px;
+}
+
+.nav-text{
+  color: rgba(233, 236, 239, .75)
+}
+
+.user-name{
+  color: black;
+}
+
+ .user-name {
+  text-decoration: none !important;
+  font-size: 17px;
+}
+
+.github-icon {
+  margin-left: 5px;
+
+}
+
+.github-icon img {
+  border-radius: 5px; /* Adjust this value for more or less curve */
+}
