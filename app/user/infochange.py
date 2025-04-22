@@ -1,7 +1,7 @@
 import os, uuid
 from datetime import datetime
 from flask import request, session, render_template, flash, redirect, url_for, current_app
-from app.models import User, Request, RequestType, db
+from app.models import User, Request, RequestType, OrganizationalUnit, db
 from app.auth.role_required import role_required
 from app.forms import InfoChangeForm
 from app.utils.request_utils import allowed_file, return_choice, generate_ssn_name
@@ -72,6 +72,12 @@ def info_change_request():
 
             if form.is_draft.data: status = "draft"
             else: status = "pending"
+
+            # Get organizational unit for form, make sure it and the manager exist
+            infochange_unit = OrganizationalUnit.query.filter_by(name='Identity and Records').first()
+            if not infochange_unit or not infochange_unit.manager_id:
+                flash('Information change request cannot be submitted. No manager found for Identity and Records.', 'error')
+                return redirect(url_for('user.user_requests'))
             
             # Build information change request
             new_request = Request(
@@ -80,7 +86,8 @@ def info_change_request():
                 request_type=RequestType.INFO,
                 pdf_link=pdf_link,
                 sig_link=unique_filename,
-                form_data=data
+                form_data=data,
+                current_approver_id=infochange_unit.manager_id
             )
 
             # Commit infochange request to database

@@ -75,6 +75,10 @@ class Request(db.Model):
     time = db.Column(db.DateTime, server_default=db.func.now())
     request_type = db.Column(db.Enum(RequestType), nullable=False)
 
+    # Approval process data
+    current_approver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    current_approver = db.relationship('User', foreign_keys=[current_approver_id])
+
     # Filenames
     pdf_link = db.Column(db.String(100), nullable=False)
     sig_link = db.Column(db.String(100))

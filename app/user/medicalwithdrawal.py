@@ -1,7 +1,7 @@
 import os, uuid
 from datetime import datetime
 from flask import request, session, render_template, flash, redirect, url_for, current_app
-from app.models import User, Request, RequestType, db
+from app.models import User, Request, RequestType, OrganizationalUnit, db
 from app.auth.role_required import role_required
 from app.forms import MedicalWithdrawalForm
 from app.user import user_bp
@@ -78,13 +78,21 @@ def medical_withdrawal_request():
             if form.is_draft.data: status = "draft"
             else: status = "pending"
 
+            # Ensure organizational unit and manager exist
+            medical_unit = OrganizationalUnit.query.filter_by(name='Health and Wellness').first()
+            if not medical_unit or not medical_unit.manager_id:
+                flash('Health and Wellness unit not found or no manager assigned.', 'error')
+                return redirect(url_for('user.user_requests'))
+
+            # Create new request
             new_request = Request(
                 user_id=user.id,
                 status=status,
                 request_type=RequestType.MEDICAL,
                 pdf_link=pdf_link,
                 sig_link=unique_filename,
-                form_data=data
+                form_data=data,
+                current_approver_id=medical_unit.manager_id
             )
 
             db.session.add(new_request)

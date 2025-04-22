@@ -1,7 +1,7 @@
 from flask import redirect, render_template, url_for, session, flash, request, current_app
 from . import auth_bp
 from app.msal_config import get_msal_app
-from app.models import User, Role, db
+from app.models import User, Role, OrganizationalUnit, db
 
 # User login
 @auth_bp.route('/login')
@@ -40,8 +40,9 @@ def get_token():
 
                 return redirect(url_for("main.home"))
             else:
-                # Every new user gets user role
+                # Every new user gets user role, check if they're the first user
                 user_role = Role.query.filter_by(name="user").first()
+                user_count = User.query.count()
 
                 # Create new user
                 user = User(
@@ -54,7 +55,13 @@ def get_token():
                 # Commit new user to database
                 db.session.add(user)
                 db.session.commit()
-                
+
+                # If first user, give all roles and assign as manager of top unit
+                if user_count == 0:
+                    top_unit = OrganizationalUnit.query.filter_by(name="Academic and Student Services").first()
+                    top_unit.manager = user
+                    db.session.commit()
+
                 # Store user data in session and redirect user to home
                 session['user'] = user_claims
                 session['logged_in'] = True

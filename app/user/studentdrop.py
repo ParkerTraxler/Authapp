@@ -1,7 +1,7 @@
 import os, uuid
 from datetime import datetime
 from flask import request, session, render_template, flash, redirect, url_for, current_app
-from app.models import User, Request, RequestType, db
+from app.models import User, Request, RequestType, OrganizationalUnit, db
 from app.auth.role_required import role_required
 from app.forms import StudentDropForm
 from app.user import user_bp
@@ -62,12 +62,19 @@ def student_drop_request():
             if form.is_draft.data: status = "draft"
             else: status = "pending"
 
+            drop_unit = OrganizationalUnit.query.filter_by(name='Advising').first()    
+            if not drop_unit or not drop_unit.manager_id:
+                flash('Advising unit not found or no manager assigned.', 'error')
+                return redirect(url_for('user.user_requests'))
+
             new_request = Request(
                 user_id=user.id,
                 status=status,
                 request_type=RequestType.DROP,
                 pdf_link=pdf_link,
                 sig_link=unique_filename,
+                form_data=data,
+                current_approver_id=drop_unit.manager_id
             )
 
             db.session.add(new_request)

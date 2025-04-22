@@ -1,7 +1,7 @@
 import os, uuid
 from datetime import datetime
 from flask import request, session, render_template, flash, redirect, url_for, current_app
-from app.models import User, Request, RequestType, db
+from app.models import User, Request, RequestType, OrganizationalUnit, db
 from app.auth.role_required import role_required
 from app.forms import FERPAForm
 from app.user import user_bp
@@ -88,6 +88,12 @@ def ferpa_request():
 
             if form.is_draft.data: status = "draft"
             else: status = "pending"
+
+            # Get organizational unit for form, make sure it and the manager exist
+            ferpa_unit = OrganizationalUnit.query.filter_by(name='Identity and Records').first()
+            if not ferpa_unit or not ferpa_unit.manager_id:
+                flash('FERPA request cannot be submitted. No manager found for Identity and Records.', 'error')
+                return redirect(url_for('user.user_requests'))
             
             # Create new FERPA request
             new_request = Request(
@@ -96,7 +102,8 @@ def ferpa_request():
                 request_type=RequestType.FERPA,
                 pdf_link=pdf_file,
                 sig_link=unique_filename,
-                form_data=data
+                form_data=data,
+                current_approver_id=ferpa_unit.manager_id
             )
 
             # Commit FERPA request to database
