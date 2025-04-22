@@ -74,7 +74,8 @@ def student_drop_request():
                 pdf_link=pdf_link,
                 sig_link=unique_filename,
                 form_data=data,
-                current_approver_id=drop_unit.manager_id
+                current_approver_id=drop_unit.manager_id,
+                current_unit_id=drop_unit.id
             )
 
             db.session.add(new_request)

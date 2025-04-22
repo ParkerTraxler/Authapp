@@ -92,7 +92,8 @@ def medical_withdrawal_request():
                 pdf_link=pdf_link,
                 sig_link=unique_filename,
                 form_data=data,
-                current_approver_id=medical_unit.manager_id
+                current_approver_id=medical_unit.manager_id,
+                current_unit_id=medical_unit.id
             )
 
             db.session.add(new_request)

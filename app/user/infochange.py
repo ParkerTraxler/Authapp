@@ -87,7 +87,8 @@ def info_change_request():
                 pdf_link=pdf_link,
                 sig_link=unique_filename,
                 form_data=data,
-                current_approver_id=infochange_unit.manager_id
+                current_approver_id=infochange_unit.manager_id,
+                current_unit_id=infochange_unit.id
             )
 
             # Commit infochange request to database
