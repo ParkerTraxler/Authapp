@@ -77,15 +77,18 @@ class Request(db.Model):
     request_type = db.Column(db.Enum(RequestType), nullable=False)
 
     # Approval process data
-    current_approver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    current_approver_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     current_approver = db.relationship('User', foreign_keys=[current_approver_id])
 
-    current_unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'), nullable=True)
+    current_unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'))
     current_unit = db.relationship('OrganizationalUnit', foreign_keys=[current_unit_id])
 
     # Delegation data
-    delegated_to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    delegated_to_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     delegated_to = db.relationship('User', foreign_keys=[delegated_to_id])
+
+    # Approval process step
+    current_step_number = db.Column(db.Integer)
 
     # Filenames
     pdf_link = db.Column(db.String(100), nullable=False)
@@ -94,7 +97,17 @@ class Request(db.Model):
     # Form fields
     form_data = db.Column(db.JSON)
 
+    # Time approved or rejected
     modified_at = db.Column(db.DateTime, nullable=True)
 
     # Relationship to user
     user = db.relationship('User', foreign_keys=[user_id], back_populates='requests')
+
+class RequestStep(db.Model):
+    __tablename__ = 'request_steps'
+
+    id = db.Column(db.Integer, primary_key=True)
+    request_type = db.Column(db.Enum(RequestType), nullable=False)
+    step_number = db.Column(db.Integer, nullable=False)
+    org_unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'))
+    org_unit = db.relationship('OrganizationalUnit', foreign_keys=[org_unit_id])

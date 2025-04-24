@@ -3,6 +3,7 @@ from app.manager import manager_bp
 from app.models import Request, User, db
 from app.auth.role_required import role_required
 from app.forms import DelegateRequestForm
+from app.utils.db_utils import advance_request
 
 # Approve request
 @manager_bp.route('/requests/approve/<int:id>', methods=['POST'])
@@ -15,12 +16,16 @@ def approve_request(id):
         flash('You are not authorized to approve this request.', 'danger')
         return redirect(url_for('manager.manage_requests'))
     
+    # If the request is at a unit and that unit has a parent, advance it to the next OU
     if req.current_unit and req.current_unit.parent:
+        # Put current request at the parent
         parent_unit = req.current_unit.parent
         req.current_unit_id = parent_unit.id
         req.current_approver_id = parent_unit.manager_id
+
         req.delegated_to_id = None
         req.modified_at = db.func.now()
+
         flash(f'The request has been forwarded to {parent_unit.name} for further approval.', 'info')
     else:
         req.status = 'approved'
