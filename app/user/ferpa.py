@@ -1,7 +1,7 @@
 import os, uuid
 from datetime import datetime
 from flask import request, session, render_template, flash, redirect, url_for, current_app
-from app.models import User, Request, RequestType, OrganizationalUnit, db
+from app.models import User, Request, RequestType, RequestStep, OrganizationalUnit, db
 from app.auth.role_required import role_required
 from app.forms import FERPAForm
 from app.user import user_bp
@@ -89,11 +89,16 @@ def ferpa_request():
             if form.is_draft.data: status = "draft"
             else: status = "pending"
 
-            # Get organizational unit for form, make sure it and the manager exist
-            ferpa_unit = OrganizationalUnit.query.filter_by(name='Identity and Records').first()
-            if not ferpa_unit or not ferpa_unit.manager_id:
-                flash('FERPA request cannot be submitted. No manager found for Identity and Records.', 'error')
-                return redirect(url_for('user.user_requests'))
+            # Get organizational unit from first request step
+            first_step = RequestStep.query.filter_by(request_type=RequestType.FERPA, step_number=1).first()
+            if not first_step:
+                flash(f'First step for approval process could not be validated.', 'warning')
+                return render_template('ferpa.html', form=form, logged_in=True)
+            
+            first_unit = OrganizationalUnit.query.filter_by(id=first_step.org_unit_id).first()
+            if not first_unit or not first_unit.manager_id:
+                flash(f'No matching organizational unit and/or manager found.', 'warning')
+                return render_template('ferpa.html', form=form, logged_in=True)
             
             # Create new FERPA request
             new_request = Request(
@@ -103,8 +108,8 @@ def ferpa_request():
                 pdf_link=pdf_file,
                 sig_link=unique_filename,
                 form_data=data,
-                current_approver_id=ferpa_unit.manager_id,
-                current_unit_id=ferpa_unit.id,
+                current_approver_id=first_unit.manager_id,
+                current_unit_id=first_unit.id,
                 current_step_number=1
             )
 
