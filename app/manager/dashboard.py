@@ -1,6 +1,6 @@
 from flask import session, redirect, url_for, render_template, flash
 from app.manager import manager_bp
-from app.models import Request, User, db
+from app.models import Request, User, OrganizationalUnit, db
 from app.auth.role_required import role_required
 
 # Manage requests dashboard
@@ -36,7 +36,7 @@ def manage_requests():
 
 @manager_bp.route('/requests/reports', methods=['GET'])
 @role_required('manager')
-def reports():
+def unit_report():
     manager = User.query.filter_by(azure_id=session['user']['sub']).first()
     roles = [role.name for role in manager.roles]
 
@@ -52,13 +52,44 @@ def reports():
     # Get rejected requests for the manager's unit
     rejected_requests = Request.query.filter_by(current_unit_id=manager.unit_id, status='rejected').all()
 
-    print(manager.unit_id)
+    # Check if the current user is manager of the root OU
+    root_unit = OrganizationalUnit.query.filter_by(name="Academic and Student Services").first()
+    is_root = manager.unit_id == root_unit.id
 
     return render_template(
-        'reports.html',
+        'unit_report.html',
         unit_requests=unit_requests,
         pending_requests=pending_requests,
         approved_requests=approved_requests,
         rejected_requests=rejected_requests,
+        is_root=is_root,
         logged_in=True,
         roles=roles)
+
+@manager_bp.route('/requests/reports/organization', methods=['GET'])
+@role_required('manager')
+def org_report():
+    manager = User.query.filter_by(azure_id=session['user']['sub']).first()
+
+    # Only allow access if manager is head of root unit
+    root_unit = OrganizationalUnit.query.filter_by(name="Academic and Student Services").first()
+    if not root_unit or manager.unit_id != root_unit.id:
+        flash("You do not have access to organizational-level reports.", "danger")
+        return redirect(url_for('manager.unit_report'))
+
+    roles = [role.name for role in manager.roles]
+
+    all_requests = Request.query.all()
+    pending_requests = Request.query.filter_by(status='pending').all()
+    approved_requests = Request.query.filter_by(status='approved').all()
+    rejected_requests = Request.query.filter_by(status='rejected').all()
+
+    return render_template(
+        'organization_report.html',
+        all_requests=all_requests,
+        pending_requests=pending_requests,
+        approved_requests=approved_requests,
+        rejected_requests=rejected_requests,
+        logged_in=True,
+        roles=roles
+    )

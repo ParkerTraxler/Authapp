@@ -6,8 +6,9 @@
 
   <!-- Header -->
   <div class="mb-4">
-    <h2 class="fw-semibold">Approval Reports</h2>
-    <p class="text-muted mb-0">Overview of request statuses within your organizational unit</p>
+    <h2 class="fw-semibold">Reports</h2>
+    <p class="text-muted mb-0">Overview of request statuses within your organizational unit.</p>
+    <p class="text-muted mb-0">You are the manager for the organization. Access the organization-level report <a href="{{ url_for('manager.org_report') }}">here</a>.</p>
   </div>
 
   <!-- Summary Cards -->
@@ -40,7 +41,7 @@
 
   <!-- Detailed Tables -->
   <div class="mb-5">
-    <h4 class="mb-3">Pending Approvals</h4>
+    <h4 class="mb-3">Pending</h4>
     {% if pending_requests %}
       <div class="table-responsive rounded shadow-sm">
         <table class="table table-bordered align-middle">
@@ -72,7 +73,7 @@
   </div>
 
   <div class="mb-5">
-    <h4 class="mb-3">Approved Requests</h4>
+    <h4 class="mb-3">Approved</h4>
     {% if approved_requests %}
       <div class="table-responsive rounded shadow-sm">
         <table class="table table-bordered align-middle">
@@ -102,7 +103,7 @@
   </div>
 
   <div class="mb-5">
-    <h4 class="mb-3">Rejected Requests</h4>
+    <h4 class="mb-3">Rejected</h4>
     {% if rejected_requests %}
       <div class="table-responsive rounded shadow-sm">
         <table class="table table-bordered align-middle">

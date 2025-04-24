@@ -66,8 +66,6 @@ def create_approval_steps_all():
     medical_units = get_units_in_order(['Health and Wellness', 'Academic and Student Services'])
     drop_units = get_units_in_order(['Advising', 'Academic and Student Services'])
 
-    print(ferpa_units)
-
     # Create base approval steps for each request type
     create_approval_steps(RequestType.FERPA, ferpa_units)
     create_approval_steps(RequestType.INFO, infochange_units)

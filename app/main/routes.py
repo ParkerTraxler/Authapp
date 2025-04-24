@@ -43,9 +43,6 @@ def page_not_found(error):
 def download_file(filename):
     # Ensure the file exists within the uploads directory
     file_path = os.path.join(current_app.config['FORM_FOLDER'], filename)
-    print("Form Folder: " + current_app.config['FORM_FOLDER'])
-    print("Filename: " + filename)
-    print("Final File Path: " + file_path)
     
     if not os.path.exists(file_path):
         flash('File not found.', 'danger')
