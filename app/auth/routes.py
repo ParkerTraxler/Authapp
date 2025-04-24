@@ -24,6 +24,7 @@ def get_token():
         if "access_token" in result:
             # Get user info
             user_claims = result.get("id_token_claims")
+            print(user_claims)
 
             # Check if user exists in database
             existing_user = User.query.filter_by(azure_id=user_claims['sub']).first()
