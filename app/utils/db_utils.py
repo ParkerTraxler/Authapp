@@ -1,4 +1,4 @@
-from app.models import Role, User, OrganizationalUnit, RequestStep, db
+from app.models import Role, User, OrganizationalUnit, RequestStep, RequestType, db
 from flask import flash
 
 # Create default roles
@@ -39,6 +39,40 @@ def create_organizational_units():
             db.session.add(unit)
 
     db.session.commit()
+
+def create_approval_steps(request_type, org_units):
+    for i, org_unit in enumerate(org_units, start=1):
+        step = RequestStep(
+            request_type=request_type,
+            step_number=i,
+            org_unit_id=org_unit.id
+        )
+        db.session.add(step)
+    
+    db.session.commit()
+    print(f"Base approval steps created for {request_type.name}.")
+
+def get_units_in_order(names):
+    # Gets list of organizational units as a set from the database, sorts them via a map
+    units = OrganizationalUnit.query.filter(OrganizationalUnit.name.in_(names)).all()
+
+    unit_map = {unit.name: unit for unit in units}
+    return [unit_map[name] for name in names if name in unit_map]
+
+def create_approval_steps_all():
+    # Define organizational units for each request type
+    ferpa_units = get_units_in_order(['Identity and Records', 'Academic and Student Services'])
+    infochange_units = get_units_in_order(['Identity and Records', 'Academic and Student Services'])
+    medical_units = get_units_in_order(['Health and Wellness', 'Academic and Student Services'])
+    drop_units = get_units_in_order(['Advising', 'Academic and Student Services'])
+
+    print(ferpa_units)
+
+    # Create base approval steps for each request type
+    create_approval_steps(RequestType.FERPA, ferpa_units)
+    create_approval_steps(RequestType.INFO, infochange_units)
+    create_approval_steps(RequestType.MEDICAL, medical_units)
+    create_approval_steps(RequestType.DROP, drop_units)
 
 def assign_manager_to_unit(unit_name, manager_id):
     # Fetch unit/manager

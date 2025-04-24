@@ -16,21 +16,7 @@ def approve_request(id):
         flash('You are not authorized to approve this request.', 'danger')
         return redirect(url_for('manager.manage_requests'))
     
-    # If the request is at a unit and that unit has a parent, advance it to the next OU
-    if req.current_unit and req.current_unit.parent:
-        # Put current request at the parent
-        parent_unit = req.current_unit.parent
-        req.current_unit_id = parent_unit.id
-        req.current_approver_id = parent_unit.manager_id
-
-        req.delegated_to_id = None
-        req.modified_at = db.func.now()
-
-        flash(f'The request has been forwarded to {parent_unit.name} for further approval.', 'info')
-    else:
-        req.status = 'approved'
-        req.current_approver_id = None
-        flash('The request has been approved successfully.', 'success')
+    advance_request(req)
 
     db.session.commit()
     return redirect(url_for('manager.manage_requests'))

@@ -75,7 +75,8 @@ def student_drop_request():
                 sig_link=unique_filename,
                 form_data=data,
                 current_approver_id=drop_unit.manager_id,
-                current_unit_id=drop_unit.id
+                current_unit_id=drop_unit.id,
+                current_step_number=1
             )
 
             db.session.add(new_request)

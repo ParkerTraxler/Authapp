@@ -104,7 +104,8 @@ def ferpa_request():
                 sig_link=unique_filename,
                 form_data=data,
                 current_approver_id=ferpa_unit.manager_id,
-                current_unit_id=ferpa_unit.id
+                current_unit_id=ferpa_unit.id,
+                current_step_number=1
             )
 
             # Commit FERPA request to database
