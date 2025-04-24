@@ -43,7 +43,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     azure_id = db.Column(db.String(100), unique=True)
     cougarnet_id = db.Column(db.String(6), unique=True)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(256))
     first_login = db.Column(db.Boolean, default=True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(100))

@@ -18,7 +18,7 @@ def login_local():
         user_id = request.form['user_id']
         password = request.form['password']
 
-        user = User.query.filter_by(user_id=user_id).first()
+        user = User.query.filter_by(cougarnet_id=user_id).first()
         if user and user.check_password(password):
             session['user'] = {
                 'sub': user.azure_id,
@@ -53,10 +53,6 @@ def get_token():
                 if not existing_user.active:
                     flash('Your account has been deactivated. Please contact an administrator.', 'danger')
                     return redirect(url_for("main.home"))
-                
-                # Redirect to setup if first login
-                # if existing_user.first_login:
-                    # return redirect(url_for('auth.setup_account'))
 
                 # Store user data in session
                 session['user'] = user_claims
