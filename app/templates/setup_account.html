@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Account Setup{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="fw-semibold">Account Setup</h2>
+  <p class="text-muted">Please set your 6-digit user ID and password.</p>
+
+  <form method="POST">
+    <div class="mb-3">
+      <label for="user_id" class="form-label">6-Digit User ID</label>
+      <input type="text" class="form-control" id="user_id" name="user_id" maxlength="6" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary">Complete Setup</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

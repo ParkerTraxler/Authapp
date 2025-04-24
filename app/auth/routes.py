@@ -3,13 +3,33 @@ from . import auth_bp
 from app.msal_config import get_msal_app
 from app.models import User, Role, OrganizationalUnit, db
 
-# User login
-@auth_bp.route('/login')
-def login():
+# Azure login
+@auth_bp.route('/login/azure')
+def login_azure():
     app_instance = get_msal_app()
     print(f"Redirect URI: {current_app.config['REDIRECT_URI']}")
     auth_url = app_instance.get_authorization_request_url(current_app.config['SCOPE'], redirect_uri=current_app.config['REDIRECT_URI'])
     return redirect(auth_url)
+
+# Local login
+@auth_bp.route('/login/local', methods=['GET', 'POST'])
+def login_local():
+    if request.method == 'POST':
+        user_id = request.form['user_id']
+        password = request.form['password']
+
+        user = User.query.filter_by(user_id=user_id).first()
+        if user and user.check_password(password):
+            session['user'] = {
+                'sub': user.azure_id,
+                'name': user.name,
+                'preferred_username': user.email
+            }
+            session['logged_in'] = True
+            return redirect(url_for('main.home'))
+
+        flash('Invalid credentials', 'danger')
+    return render_template('login_local.html')
 
 # Retreive access token from Azure
 @auth_bp.route('/get_token')
@@ -24,7 +44,6 @@ def get_token():
         if "access_token" in result:
             # Get user info
             user_claims = result.get("id_token_claims")
-            print(user_claims)
 
             # Check if user exists in database
             existing_user = User.query.filter_by(azure_id=user_claims['sub']).first()
@@ -34,6 +53,10 @@ def get_token():
                 if not existing_user.active:
                     flash('Your account has been deactivated. Please contact an administrator.', 'danger')
                     return redirect(url_for("main.home"))
+                
+                # Redirect to setup if first login
+                # if existing_user.first_login:
+                    # return redirect(url_for('auth.setup_account'))
 
                 # Store user data in session
                 session['user'] = user_claims
@@ -66,9 +89,39 @@ def get_token():
                 # Store user data in session and redirect user to home
                 session['user'] = user_claims
                 session['logged_in'] = True
+
+                # Redirect to setup if first login
+                if user.first_login:
+                    return redirect(url_for('auth.setup_account'))
+
                 return redirect(url_for("main.home"))
     
     return "Login failed", 401
+
+@auth_bp.route('/setup-account', methods=['GET', 'POST'])
+def setup_account():
+    if request.method == 'POST':
+        cougarnet_id = request.form['user_id']
+        password = request.form['password']
+
+        if not cougarnet_id.isdigit() or len(cougarnet_id) != 6:
+            flash('User ID must be a 6-digit number.', 'danger')
+            return render_template('setup_account.html')
+
+        if User.query.filter_by(cougarnet_id=cougarnet_id).first():
+            flash('That ID is already taken.', 'danger')
+            return render_template('setup_account.html')
+
+        user = User.query.filter_by(azure_id=session['user']['sub']).first()
+        user.cougarnet_id = cougarnet_id
+        user.set_password(password)
+        user.first_login = False
+        db.session.commit()
+
+        flash('Setup complete. You can now login using your 6-digit ID.', 'success')
+        return redirect(url_for('main.home'))
+
+    return render_template('setup_account.html')
 
 # Log out of account, clear token
 @auth_bp.route('/logout')
